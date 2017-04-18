@@ -1,14 +1,42 @@
 import os
+import pprint
 import json
 import sys
+import sqlite3
 from subprocess import PIPE, run, STDOUT, CalledProcessError
-from flask import Flask, request, abort, render_template, Response
+from flask import Flask, request, abort, render_template, jsonify
 
 FAPTP = sys.argv[1]
+DBNAME = "faptp.db"
 INPUT_FILE = 'intemp'
 OUTPUT_FILE = 'outtemp'
 CONFIG_FILE = 'conftemp'
 app = Flask(__name__)
+
+def init_db():
+    conn = sqlite3.connect(DBNAME)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS Solucoes
+                (id INTEGER PRIMARY KEY, entrada TEXT, config TEXT, saida TEXT)''')
+    conn.commit()
+    conn.close()
+
+
+def insert_solucao(entrada, config, saida):
+    entrada = json.dumps(entrada)
+    config = json.dumps(config)
+    saida = json.dumps(saida)
+    sql = '''INSERT INTO Solucoes (entrada, config, saida)
+             VALUES (?, ?, ?)'''
+
+    conn = sqlite3.connect(DBNAME)
+    c = conn.cursor()
+    c.execute(sql, (entrada, config, saida))
+    pk = c.lastrowid
+    conn.commit()
+    conn.close()
+
+    return pk
 
 
 def executar_solver(dados):
@@ -21,7 +49,7 @@ def executar_solver(dados):
     with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
         json.dump(configuracao, f)
 
-    args = [faptp, '-i', INPUT_FILE, '-o', OUTPUT_FILE, '-c', CONFIG_FILE]
+    args = [FAPTP, '-i', INPUT_FILE, '-o', OUTPUT_FILE, '-c', CONFIG_FILE]
     processo = run(args, universal_newlines=True)
 
     try:
@@ -38,7 +66,8 @@ def executar_solver(dados):
         saida = f.read()
     os.remove(OUTPUT_FILE)
 
-    return saida
+    pk = insert_solucao(entrada, configuracao, saida)
+    return saida, pk
 
 
 @app.route('/')
@@ -49,14 +78,16 @@ def home():
 @app.route('/gerar_horario', methods=['POST'])
 def gerar_horario():
     dados = request.json
-    print(dados)
+    pprint.pprint(dados)
 
     try:
-        saida = executar_solver(dados)
-        return Response(saida, mimetype='application/json')
-    except:
+        saida, pk = executar_solver(dados)
+        return jsonify(saida=saida, id=pk)
+    except Exception as e:
+        print(e)
         abort(401)
 
 
 if __name__ == '__main__':
+    init_db()
     app.run(port=int("80"), debug=True)

@@ -1,18 +1,42 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>faptp</title>
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
-</head>
+    <head>
+        <meta charset="utf-8">
+        <title>faptp</title>
+        <script src="{{ url_for('static', filename='app.js') }}"></script>
+    </head>
 
-<body>
-    <p>Fazer upload do arquivo de entrada</p>
-    <input type="file" accept=".json" id="entrada-upload"/>
-    <button id="gerar-btn">Gerar horário</button>
+    <body>
+        <p>Fazer upload do arquivo de entrada</p>
+        <input type="file" accept=".json" id="entrada-upload"/>
+        <button id="gerar-btn">Gerar horário</button>
 
-    <div id="professores"></div>
-    <div id="disciplinas"></div>
-</body>
+        <table id="professores">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Horas desejadas</th>
+                    <th>Disciplinas preferidas</th>
+                    <th>Disponibilidade</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <table id="disciplinas">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Difícil?</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+    </body>
 
 </html>
