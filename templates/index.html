@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>faptp</title>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+
+<body>
+    <p>Fazer upload do arquivo de entrada</p>
+    <input type="file" accept=".json" id="entrada-upload"/>
+    <button id="gerar-btn">Gerar horário</button>
+
+    <div id="professores"></div>
+    <div id="disciplinas"></div>
+</body>
+
+</html>
