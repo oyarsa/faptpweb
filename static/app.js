@@ -9,42 +9,70 @@ let entrada = null
  * Objeto com os parâmetros de configuração para o solver. Será modificado
  * partir dos controles da interface, tendo uma valor default inicial.
  * @property {string} algoritmo Nome do algoritmo a ser utiliado.
+ *    Valores possíveis: AG, HySST, SA-ILS, WDJU
  * @property {number} tempo Tempo de execução máximo, em segundos.
  * @property {object} parametros Parâmetros de configuração do algoritmo.
+ *    Valores possíveis:
+ *        AG: TaxaMut NIndiv %Cruz CruzOper NMut NTour GIter GNViz GAlfa
+ *        HySST: MaxLevel TStart TStep IterHc IterMut
+ *        SA-ILS: FracTime SAlfa t0 SAiter SAreaq SAchances ILSiter ILSpmax ILSp0
+ *        WDJU: StagLimit JumpFactor
  * @property {string} fo Qual a função a ser usada (preferências ou grades).
+ *    Valores possíveis: pref, grades
  * @property {object} pesos Pesos da função objetivo, se for usada a de preferências.
  * @property {number} numeroDiasLetivos Número de dias letivos por semana.
  * @property {number} numeroHorarios Número de horários por dia.
  */
 let config = {
-    'algoritmo': 'AG',
-    'tempo': 180,
-    'parametros': {
-        'PopTam': 20,
-        'pCruz': 0.3,
-        'ntMut': 4,
-        'torTam': 4,
-        'graspMaxIt': 15,
-        'numVizinhos': 2,
-        'alfa': 0.2,
-        'agMaxIt': 20,
-        'opCruz': 'CX',
-        'probMutacao': 0.15
+    algoritmo: 'AG',
+    tempo: 180,
+    parametros: {
+        // AG
+        NIndiv: 20,
+        '%Cruz': 30,
+        NMut: 4,
+        NTour: 4,
+        AGIter: 20,
+        CruzOper: 'CX',
+        TaxaMut: 15,
+        // GRASP
+        GIter: 15,
+        GNViz: 4,
+        GAlfa: 20,
+        // HySST
+        MaxLevel: 15,
+        TStart: 5,
+        TStep: 5,
+        IterHc: 5,
+        IterMut: 5,
+        // SA-ILS
+        FracTime: 100,
+        SAlfa: 0.97,
+        t0: 1,
+        SAiter: 100,
+        SAreaq: 250,
+        SAchance: 0,
+        ILSiter: 10,
+        ILSpmax: 10,
+        ILSp0: 1,
+        // WDJU
+        StagLimit: 10,
+        JumpFactor: 0.001
     },
-    'fo': 'Preferencias',
-    'pesos': {
-        'Janelas': 2,
-        'IntervalosTrabalho': 1.5,
-        'NumDiasAula': 3.5,
-        'AulasSabado': 4.667,
-        'AulasSeguidas': 4,
-        'AulasSeguidasDificil': 2.5,
-        'AulaDificilUltimoHorario': 2.333,
-        'PreferenciasProfessores': 3.167,
-        'AulasProfessores': 1.667
+    fo: 'pref',
+    pesos: {
+        Janelas: 2,
+        IntervalosTrabalho: 1.5,
+        NumDiasAula: 3.5,
+        AulasSabado: 4.667,
+        AulasSeguidas: 4,
+        AulasSeguidasDificil: 2.5,
+        AulaDificilUltimoHorario: 2.333,
+        PreferenciasProfessores: 3.167,
+        AulasProfessores: 1.667
     },
-    'numeroHorarios': 4,
-    'numeroDiasLetivos': 6
+    numeroHorarios: 4,
+    numeroDiasLetivos: 6
 }
 
 /**
@@ -66,7 +94,7 @@ function recebe_upload(evt) {
 /**
  * Recupera um professor a partir de sua ID.
  * @param {string} id Identificação do professor.
- * @returns {Object} Professor.
+ * @returns {object} Professor.
  */
 function get_professor(id) {
     return entrada.professores.find(p => p.id == id)
@@ -75,10 +103,27 @@ function get_professor(id) {
 /**
  * Recupera uma disciplina a partir de sua ID.
  * @param {string} id Identificação da disciplina.
- * @returns {Object} Disciplina.
+ * @returns {object} Disciplina.
  */
 function get_disciplina(id) {
     return entrada.disciplinas.find(d => d.id == id)
+}
+
+function handle_config(evt) {
+    console.log('config');
+    const input = evt.target;
+    const categoria = input.getAttribute('data-cat')
+    const obj = categoria ? config[categoria] : config
+    const campo = input.getAttribute('data-field')
+    obj[campo] = Number(input.value)
+}
+
+function handle_algo(evt) {
+
+}
+
+function handle_fo(evt) {
+
 }
 
 /**
@@ -89,7 +134,7 @@ function get_disciplina(id) {
 function registra_horas(evt) {
     console.log('horas')
     const input = evt.target
-    const id = input.parentNode.parentNode.getAttribute('id')
+    const id = input.parentNode.parentNode.getAttribute('data-id')
     get_professor(id).preferenciasHoras = parseInt(input.value, 10)
 }
 
@@ -101,7 +146,7 @@ function registra_horas(evt) {
 function registra_discs(evt) {
     console.log('discs')
     const input = evt.target
-    const id = input.parentNode.parentNode.getAttribute('id')
+    const id = input.parentNode.parentNode.getAttribute('data-id')
     const disciplinas = input.value.split('\n').map(s => s.trim())
     get_professor(id).preferenciasDiscs = disciplinas
 }
@@ -114,7 +159,7 @@ function registra_discs(evt) {
 function registra_dificil(evt) {
     console.log('dificil')
     const input = evt.target
-    const id = input.parentNode.parentNode.getAttribute('id')
+    const id = input.parentNode.parentNode.getAttribute('data-id')
     get_disciplina(id).dificil = input.checked
 }
 
@@ -130,7 +175,7 @@ function matriz_vazia() {
     let array = []
     let row = []
 
-    while (cols--) row.push(0)
+    while (cols--) row.push(1)
     while (rows--) array.push(row.slice())
     return array
 }
@@ -144,22 +189,23 @@ function registra_disponibilidade(evt) {
     console.log('disponibilidade')
     const input = evt.target
 
-    const id = input.getAttribute('id')
+    const id = input.getAttribute('data-id')
     const prof = get_professor(id)
-    const dia = parseInt(input.getAttribute('dia'), 10)
-    const horario = parseInt(input.getAttribute('horario'), 10)
+    const dia = parseInt(input.getAttribute('data-dia'), 10)
+    const horario = parseInt(input.getAttribute('data-horario'), 10)
 
-    if (!prof.hasOwnProperty('disponibilidade'))
-        prof.disponibilidade = matriz_vazia()
     prof.disponibilidade[horario][dia] = input.checked
 }
 
 /**
- * Desenha a matriz de disponibilidades do professor `profid` no elemento `cell`.
+ * Desenha a matriz de disponibilidades do professor `prof` no elemento `cell`.
  * @param {Element} cell Elemento onde a matriz será desenhada.
- * @param {string} profid Identificação do professor.
+ * @param {object} prof Professor cuja matriz será desenhada.
  */
-function render_matriz(cell, profid) {
+function render_matriz(cell, prof) {
+    if (!prof.hasOwnProperty('disponibilidade'))
+        prof.disponibilidade = matriz_vazia()
+
     const table = document.createElement('table')
     cell.appendChild(table)
 
@@ -169,7 +215,7 @@ function render_matriz(cell, profid) {
     const hr = document.createElement('tr')
     header.appendChild(hr)
 
-    const headers = ['Horário', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+    const headers = [' ', 'S', 'T', 'Q', 'Q', 'S', 'S', 'D']
     headers.forEach(h => {
         const th = document.createElement('th')
         th.appendChild(document.createTextNode(h))
@@ -188,17 +234,17 @@ function render_matriz(cell, profid) {
         tr.appendChild(td)
 
         for (let j = 0; j < config.numeroDiasLetivos; j++) {
-            td = document.createElement('td')
+            const td = document.createElement('td')
             tr.appendChild(td)
 
             const checkbox = document.createElement('input')
             td.appendChild(checkbox)
 
             checkbox.type = 'checkbox'
-            checkbox.checked = true
-            checkbox.setAttribute('dia') = j
-            checkbox.setAttribute('horario') = i
-            checkbox.setAttribute('id') = profid
+            checkbox.checked = prof.disponibilidade[i][j]
+            checkbox.setAttribute('data-dia', j)
+            checkbox.setAttribute('data-horario', i)
+            checkbox.setAttribute('data-id', prof.id)
             checkbox.addEventListener('change', registra_disponibilidade, false)
         }
     }
@@ -207,20 +253,22 @@ function render_matriz(cell, profid) {
 /**
  * Desenha uma linha do professor na tabela de professores, contendo
  * seu ID, nome e controles para número de horas e disciplinas desejadas.
- * @param {Object} prof Professor a ser representado na tabela.
+ * @param {object} prof Professor a ser representado na tabela.
  */
 function render_professor(prof) {
     const table = document.getElementById('professores').getElementsByTagName('tbody')[0]
     const linha = table.insertRow(table.rows.length)
 
-    linha.setAttribute('id', prof.id)
+    linha.setAttribute('data-id', prof.id)
     linha.insertCell(0).innerHTML = prof.id
     linha.insertCell(1).innerHTML = prof.nome
     linha.insertCell(2).innerHTML = "<input type=number placeholder='Horas' class='horas-pref' min='0'/>"
-    linha.cells[2].getElementsByTagName('input')[0].addEventListener('change', registra_horas, false)
+    linha.cells[2].getElementsByTagName('input')[0]
+        .addEventListener('change', registra_horas, false)
     linha.insertCell(3).innerHTML = "<textarea placeholder='Disciplinas' class='disc-pref'></textarea>"
-    linha.cells[3].getElementsByTagName('textarea')[0].addEventListener('change', registra_discs, false)
-    render_matriz(linha.insertCell(4), prof.id)
+    linha.cells[3].getElementsByTagName('textarea')[0]
+        .addEventListener('change', registra_discs, false)
+    render_matriz(linha.insertCell(4), prof)
 }
 
 /**
@@ -235,17 +283,19 @@ function render_preferencias_professor() {
 /**
  * Desenha uma linha para disciplina na tabela de disciplinas, contendo
  * sua ID, seu nome e um checkbox para indicar se ela é uma disciplina difícil.
- * @param {Object} disc Disciplina a ser representada na tabela.
+ * @param {object} disc Disciplina a ser representada na tabela.
  */
 function render_disciplina(disc) {
     const table = document.getElementById('disciplinas').getElementsByTagName('tbody')[0]
 
     const linha = table.insertRow(table.rows.length)
-    linha.setAttribute('id', disc.id)
+    linha.setAttribute('data-id', disc.id)
     linha.insertCell(0).innerHTML = disc.id
     linha.insertCell(1).innerHTML = disc.nome
-    linha.insertCell(2).innerHTML = "<input type='checkbox' class='disc-dificil'/>"
-    linha.cells[2].getElementsByTagName('input')[0].addEventListener('change', registra_dificil, false)
+    linha.insertCell(2).innerHTML = disc.periodo
+    linha.insertCell(3).innerHTML = "<input type='checkbox' class='disc-dificil'/>"
+    linha.cells[3].getElementsByTagName('input')[0]
+        .addEventListener('change', registra_dificil, false)
 }
 
 /**
@@ -303,4 +353,10 @@ function enviar_json() {
 window.onload = function() {
     document.getElementById('entrada-upload').addEventListener('change', recebe_upload, false)
     document.getElementById('gerar-btn').addEventListener('click', enviar_json, false)
+
+    document.querySelectorAll('.numeric-conf')
+        .forEach(e => e.addEventListener('change', handle_config, false))
+
+    document.getElementById('algoritmo-select').addEventListener('change', handle_algo, false);
+    document.getElementById('fo-select').addEventListener('change', handle_fo, false);
 }
