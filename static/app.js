@@ -109,7 +109,15 @@ function get_disciplina(id) {
     return entrada.disciplinas.find(d => d.id == id)
 }
 
-function handle_config(evt) {
+/**
+ * Registra mudança na configuração para parâmetros numéricos, transportando
+ * o novo valor para o objeto {@link config}. Para isso, o input deve possuir
+ * a classe `numeric-conf`, além do atributo `data-field`, que diz a  qual
+ * campo do objeto ele diz respeito. O atributo `data-cat` é usado para indicar
+ * a qual sub-objeto ele pertence, mas é opcional.
+ * @param {Event} evt Evento ativado quando o input é modificado.
+ */
+function handle_numeric_config(evt) {
     console.log('config');
     const input = evt.target;
     const categoria = input.getAttribute('data-cat')
@@ -124,6 +132,18 @@ function handle_algo(evt) {
 
 function handle_fo(evt) {
 
+}
+
+/**
+ * Ativa os gatilhos do evento do tipo `event_name` no elemento `element`,
+ * independente de como esse evento foi adicionado, seja por `on...` ou por
+ * `addEventListener`.
+ * @param {EventTarget} element Elemento que irá disparar o evento.
+ * @param {Event} event_name Nome do evento a ser disparado.
+ */
+function trigger_event(element, event_name) {
+    const event = new Event(event_name)
+    element.dispatchEvent(event)
 }
 
 /**
@@ -355,7 +375,7 @@ window.onload = function() {
     document.getElementById('gerar-btn').addEventListener('click', enviar_json, false)
 
     document.querySelectorAll('.numeric-conf')
-        .forEach(e => e.addEventListener('change', handle_config, false))
+        .forEach(e => e.addEventListener('change', handle_numeric_config, false))
 
     document.getElementById('algoritmo-select').addEventListener('change', handle_algo, false);
     document.getElementById('fo-select').addEventListener('change', handle_fo, false);
