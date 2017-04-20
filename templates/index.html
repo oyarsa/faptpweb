@@ -68,7 +68,7 @@
         <div id="param-div">
             <h3>Parâmetros dos algoritmos</h3>
 
-            <div data-cat="AG">
+            <div data-cat="AG" class="algo-div">
                 <div>
                     <label for="ag-num-indiv">[AG] Número de indivíduos</label>
                     <input type="number" id="ag-num-indiv" min="1" value="20" class="numeric-conf"
@@ -115,7 +115,7 @@
                 </div>
             </div>
 
-            <div data-cat="HySST" hidden>
+            <div data-cat="HySST" hidden class="algo-div">
                 <div>
                     <label for="hysst-max-level">[HySST] Max level</label>
                     <input type="number" id="hysst-max-level" min="1" value="15" class="numeric-conf"
@@ -147,7 +147,7 @@
                 </div>
             </div>
 
-            <div data-cat="SA-ILS" hidden>
+            <div data-cat="SA-ILS" hidden class="algo-div">
                 <div>
                     <label for="sails-timeout">[SA/ILS] Timeout por execução (fração do total)</label>
                     <input type="number" id="sails-timeout" min="1" value="100" class="numeric-conf"
@@ -206,7 +206,7 @@
                 </div>
             </div>
 
-            <div data-cat="WDJU" hidden>
+            <div data-cat="WDJU" hidden class="algo-div">
                 <div>
                     <label for="wdju-stagnation">[WDJU] Stagnation limit</label>
                     <input type="number" id="wdju-stagnation" min="1" value="10" class="numeric-conf"
@@ -220,7 +220,7 @@
                 </div>
             </div>
 
-            <div data-cat="GRASP" hidden>
+            <div data-cat="GRASP" hidden id="grasp-div">
                 <div>
                     <label for="grasp-num-iter">[GRASP] Número de iterações sem melhoria</label>
                     <input type="number" id="grasp-num-iter" min="1" value="15" class="numeric-conf"

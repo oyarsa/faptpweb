@@ -50,13 +50,16 @@ def executar_solver(dados):
         json.dump(configuracao, f)
 
     args = [FAPTP, '-i', INPUT_FILE, '-o', OUTPUT_FILE, '-c', CONFIG_FILE]
-    processo = run(args, universal_newlines=True)
 
     try:
+        processo = run(args, universal_newlines=True)
         processo.check_returncode()
     except CalledProcessError as e:
         print('Erro ao executar o processo, código: {}, mensagem: {}'
               .format(e.returncode, e.stderr))
+        raise
+    except FileNotFoundError as e:
+        print('Executável do faptp não encontrado: {}'.format(e.strerror))
         raise
     finally:
         os.remove(INPUT_FILE)
@@ -84,7 +87,7 @@ def gerar_horario():
         saida, pk = executar_solver(dados)
         return jsonify(saida=saida, id=pk)
     except Exception as e:
-        print(e)
+        print('Exceção: ', e)
         abort(401)
 
 

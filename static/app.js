@@ -47,7 +47,7 @@ let config = {
         IterMut: 5,
         // SA-ILS
         FracTime: 100,
-        SAlfa: 0.97,
+        SAlfa: 0.935,
         t0: 1,
         SAiter: 100,
         SAreaq: 250,
@@ -118,8 +118,8 @@ function get_disciplina(id) {
  * @param {Event} evt Evento ativado quando o input é modificado.
  */
 function handle_numeric_config(evt) {
-    console.log('config');
-    const input = evt.target;
+    console.log('config')
+    const input = evt.target
     const categoria = input.getAttribute('data-cat')
     const obj = categoria ? config[categoria] : config
     const campo = input.getAttribute('data-field')
@@ -127,11 +127,33 @@ function handle_numeric_config(evt) {
 }
 
 function handle_algo(evt) {
+    console.log('algoritmo')
+    const nome = evt.target.value
+    config.algoritmo = nome
+
+    const algos = document.querySelectorAll('.algo-div').forEach((a) => {
+        if (a.getAttribute('data-cat') == nome)
+            a.removeAttribute('hidden')
+        else
+            a.setAttribute('hidden', true)
+    })
 
 }
 
 function handle_fo(evt) {
+    console.log('FO')
+    const nome = evt.target.value
+    config.fo = nome
 
+    const pesos = document.getElementById('pesos-div')
+    const grasp = document.getElementById('grasp-div')
+    if (nome == 'pref') {
+        pesos.removeAttribute('hidden')
+        grasp.setAttribute('hidden', true)
+    } else {
+        pesos.setAttribute('hidden', true)
+        grasp.removeAttribute('hidden')
+    }
 }
 
 /**
@@ -139,7 +161,7 @@ function handle_fo(evt) {
  * independente de como esse evento foi adicionado, seja por `on...` ou por
  * `addEventListener`.
  * @param {EventTarget} element Elemento que irá disparar o evento.
- * @param {Event} event_name Nome do evento a ser disparado.
+ * @param {string} event_name Nome do evento a ser disparado.
  */
 function trigger_event(element, event_name) {
     const event = new Event(event_name)
@@ -149,7 +171,7 @@ function trigger_event(element, event_name) {
 /**
  * Modifica valor de horas desejadas do professor a quem
  * o input modificado pertence.
- * @param {Event} evt Evento ativado quando o número de horas é modificado;
+ * @param {Event} evt Evento ativado quando o número de horas é modificado.
  */
 function registra_horas(evt) {
     console.log('horas')
@@ -366,6 +388,15 @@ function enviar_json() {
     xhr.send(JSON.stringify(json))
 }
 
+function set_param_value(element) {
+    const param = element.getAttribute('data-field')
+    let obj = config
+    let cat = element.getAttribute('data-cat')
+    if (cat) obj = obj[cat]
+    const value = obj[param]
+    element.value = value
+}
+
 /**
  * Registra os eventos de mudança para o controle de upload da entrada e
  * envio para o servidor.
@@ -377,6 +408,11 @@ window.onload = function() {
     document.querySelectorAll('.numeric-conf')
         .forEach(e => e.addEventListener('change', handle_numeric_config, false))
 
-    document.getElementById('algoritmo-select').addEventListener('change', handle_algo, false);
-    document.getElementById('fo-select').addEventListener('change', handle_fo, false);
+    document.getElementById('algoritmo-select').addEventListener('change', handle_algo, false)
+    document.getElementById('fo-select').addEventListener('change', handle_fo, false)
+
+    // Coloca todos os selects em seus default, para evitar problemas com eventos
+    document.querySelectorAll('select').forEach(e => e.selectedIndex = 0)
+
+    document.querySelectorAll('.numeric-conf').forEach(set_param_value)
 }
