@@ -398,9 +398,8 @@ function enviar_json() {
 }
 
 function disponibilizar_solucao(res) {
-    const solucao = document.createElement('div')
-    solucao.id = 'solucao'
-    document.querySelector('body').appendChild(solucao)
+    const solucao = document.getElementById('solucao')
+    solucao.innerHTML = ""
 
     const texto = document.createElement('h2')
     solucao.appendChild(texto)

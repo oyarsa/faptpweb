@@ -54,9 +54,10 @@ def insert_solucao(entrada, config, saida):
 
 def recupera_solucao(pk):
     "A partir da `pk`, recupera os dados de entrada, configuração e solução."
-    sql = 'SELECT * FROM Solucao WHERE id = ?'
+    sql = 'SELECT * FROM Solucoes WHERE id = ?'
 
     conn = sqlite3.connect(DBNAME)
+    c = conn.cursor()
     c.execute(sql, (pk,))
     tupla = c.fetchone()
 
@@ -127,6 +128,12 @@ def error(status_code, message):
 def home():
     "Rota principal, renderiza o formulário"
     return render_template('index.html')
+
+
+@app.route('/pesquisar')
+def pesquisar():
+    "Rota de pesquisa por uma solução"
+    return render_template('pesquisar.html')
 
 
 @app.route('/gerar_horario', methods=['POST'])
