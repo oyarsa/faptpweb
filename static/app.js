@@ -119,29 +119,31 @@ function get_disciplina(id) {
  */
 function handle_numeric_config(evt) {
     console.log('config')
+
     const input = evt.target
     const categoria = input.getAttribute('data-cat')
     const obj = categoria ? config[categoria] : config
     const campo = input.getAttribute('data-field')
-    obj[campo] = Number(input.value)
+    obj[campo] = Number.parseFloat(input.value)
 }
 
 function handle_algo(evt) {
     console.log('algoritmo')
+
     const nome = evt.target.value
     config.algoritmo = nome
 
-    const algos = document.querySelectorAll('.algo-div').forEach((a) => {
+    document.querySelectorAll('.algo-div').forEach((a) => {
         if (a.getAttribute('data-cat') == nome)
             a.removeAttribute('hidden')
         else
             a.setAttribute('hidden', true)
     })
-
 }
 
 function handle_fo(evt) {
     console.log('FO')
+
     const nome = evt.target.value
     config.fo = nome
 
@@ -157,27 +159,16 @@ function handle_fo(evt) {
 }
 
 /**
- * Ativa os gatilhos do evento do tipo `event_name` no elemento `element`,
- * independente de como esse evento foi adicionado, seja por `on...` ou por
- * `addEventListener`.
- * @param {EventTarget} element Elemento que irá disparar o evento.
- * @param {string} event_name Nome do evento a ser disparado.
- */
-function trigger_event(element, event_name) {
-    const event = new Event(event_name)
-    element.dispatchEvent(event)
-}
-
-/**
  * Modifica valor de horas desejadas do professor a quem
  * o input modificado pertence.
  * @param {Event} evt Evento ativado quando o número de horas é modificado.
  */
 function registra_horas(evt) {
     console.log('horas')
+
     const input = evt.target
     const id = input.parentNode.parentNode.getAttribute('data-id')
-    get_professor(id).preferenciasHoras = parseInt(input.value, 10)
+    get_professor(id).preferenciasHoras = Number.parseInt(input.value, 10)
 }
 
 /**
@@ -187,6 +178,7 @@ function registra_horas(evt) {
  */
 function registra_discs(evt) {
     console.log('discs')
+
     const input = evt.target
     const id = input.parentNode.parentNode.getAttribute('data-id')
     const disciplinas = input.value.split('\n').map(s => s.trim())
@@ -206,7 +198,7 @@ function registra_dificil(evt) {
 }
 
 /**
- * Gera uma matriz de zeros NxM, onde N é o número de dias letivos e
+ * Gera uma matriz de uns NxM, onde N é o número de dias letivos e
  * M é o número de horários por dia. Ambos os valores são obtidos através
  * da configuração vigente (veja {@link config}).
  * @returns {number[][]} Matriz NxM de zeros.
@@ -229,12 +221,12 @@ function matriz_vazia() {
  */
 function registra_disponibilidade(evt) {
     console.log('disponibilidade')
-    const input = evt.target
 
+    const input = evt.target
     const id = input.getAttribute('data-id')
     const prof = get_professor(id)
-    const dia = parseInt(input.getAttribute('data-dia'), 10)
-    const horario = parseInt(input.getAttribute('data-horario'), 10)
+    const dia = Number.parseInt(input.getAttribute('data-dia'), 10)
+    const horario = Number.parseInt(input.getAttribute('data-horario'), 10)
 
     prof.disponibilidade[horario][dia] = input.checked
 }
@@ -258,10 +250,10 @@ function render_matriz(cell, prof) {
     header.appendChild(hr)
 
     const headers = [' ', 'S', 'T', 'Q', 'Q', 'S', 'S', 'D']
-    headers.forEach(h => {
+    headers.forEach((h) => {
         const th = document.createElement('th')
-        th.appendChild(document.createTextNode(h))
         hr.appendChild(th)
+        th.appendChild(document.createTextNode(h))
     })
 
     const body = document.createElement('tbody')
@@ -272,8 +264,8 @@ function render_matriz(cell, prof) {
         body.appendChild(tr)
 
         const td = document.createElement('td')
-        td.appendChild(document.createTextNode((i + 1) + '°'))
         tr.appendChild(td)
+        td.appendChild(document.createTextNode((i + 1) + '°'))
 
         for (let j = 0; j < config.numeroDiasLetivos; j++) {
             const td = document.createElement('td')
@@ -411,8 +403,7 @@ window.onload = function() {
     document.getElementById('algoritmo-select').addEventListener('change', handle_algo, false)
     document.getElementById('fo-select').addEventListener('change', handle_fo, false)
 
-    // Coloca todos os selects em seus default, para evitar problemas com eventos
+    // Coloca todos os inputs em seus defaults, para evitar problemas com eventos
     document.querySelectorAll('select').forEach(e => e.selectedIndex = 0)
-
     document.querySelectorAll('.numeric-conf').forEach(set_param_value)
 }
