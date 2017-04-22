@@ -76,6 +76,21 @@ let config = {
 }
 
 /**
+ * Aplicação parcial (currying) de `fn`.
+ * @example
+ *    function mult(x, y) { return x * y}
+ *    const multBy2= curry(mult, 2)
+ *    multBy2(10) === 20
+ * @param {function} fn Função a ser parcialmente aplicada.
+ * @param {...*} args1 Os primeiros argumentos de `fn`
+ * @returns {function} Uma função que recebe os argumentos restantes, aplicando `args1`
+ *                     juntamente com eles para de fato executar a função.
+ */
+function curry(fn, ...args1) {
+    return (...args2) => fn(...args1, ...args2);
+}
+
+/**
  * Recebe o JSON enviado como entrada via upload, armazenando
  * no objeto global `entrada`.
  * @param {Event} evt Evento ativado quando um arquivo for enviado.
@@ -89,24 +104,6 @@ function recebe_upload(evt) {
     }
 
     reader.readAsText(evt.target.files[0])
-}
-
-/**
- * Recupera um professor a partir de sua ID.
- * @param {string} id Identificação do professor.
- * @returns {object} Professor.
- */
-function get_professor(id) {
-    return entrada.professores.find(p => p.id == id)
-}
-
-/**
- * Recupera uma disciplina a partir de sua ID.
- * @param {string} id Identificação da disciplina.
- * @returns {object} Disciplina.
- */
-function get_disciplina(id) {
-    return entrada.disciplinas.find(d => d.id == id)
 }
 
 /**
@@ -127,6 +124,11 @@ function handle_numeric_config(evt) {
     obj[campo] = Number.parseFloat(input.value)
 }
 
+/**
+ * Registra mudança no algoritmo selecionado, exibindo os inputs
+ * de seus parâmetros e escondendo os restantes.
+ * @param {Event} evt Evento ativado quando o select de algoritmos é modificado.
+ */
 function handle_algo(evt) {
     console.log('algoritmo')
 
@@ -141,6 +143,12 @@ function handle_algo(evt) {
     })
 }
 
+/**
+ * Registra mudança no tipo de fo selecionada, mostrando os inputs para os
+ * pesos se 'Preferências' for selecionado, ou então mostrando os parâmetros
+ * do GRASP se 'Grade' for selecionado.
+ * @param {Event} evt Evento ativado quando o select de fo é modificado.
+ */
 function handle_fo(evt) {
     console.log('FO')
 
@@ -161,55 +169,50 @@ function handle_fo(evt) {
 /**
  * Modifica valor de horas desejadas do professor a quem
  * o input modificado pertence.
+ * @param {object} prof Professor a quem pertence o input de horas.
  * @param {Event} evt Evento ativado quando o número de horas é modificado.
  */
-function registra_horas(evt) {
+function registra_horas(prof, evt) {
     console.log('horas')
-
-    const input = evt.target
-    const id = input.parentNode.parentNode.getAttribute('data-id')
-    get_professor(id).preferenciasHoras = Number.parseInt(input.value, 10)
+    prof.preferenciasHoras = Number.parseInt(evt.target.value, 10)
 }
 
 /**
  * Modifica a lista de disciplinas desejadas do professor a quem
  * o input modificado pertecence.
+ * @param {object} prof Professor a quem pertence o input de disciplinas.
  * @param {Event} evt Evento ativado quando as disciplinas desejadas são modificadas.
  */
-function registra_discs(evt) {
+function registra_discs(prof, evt) {
     console.log('discs')
-
-    const input = evt.target
-    const id = input.parentNode.parentNode.getAttribute('data-id')
-    const disciplinas = input.value.split('\n').map(s => s.trim())
-    get_professor(id).preferenciasDiscs = disciplinas
+    prof.preferenciasDiscs = evt.target.value.split('\n').map(s => s.trim())
 }
 
 /**
  * Modifica a dificuldade da disciplina (se é ou não difícil) a quem
  * o input modificado pertence.
+ * @param {object} disc Disciplina a quem pertence o input de dificuldade.
  * @param {Event} evt Evento ativado quando a dificuldade da disciplina é modificada
  */
-function registra_dificil(evt) {
+function registra_dificil(disc, evt) {
     console.log('dificil')
-    const input = evt.target
-    const id = input.parentNode.parentNode.getAttribute('data-id')
-    get_disciplina(id).dificil = input.checked
+    disc.dificil = evt.target.checked
 }
 
 /**
- * Gera uma matriz de uns NxM, onde N é o número de dias letivos e
- * M é o número de horários por dia. Ambos os valores são obtidos através
- * da configuração vigente (veja {@link config}).
- * @returns {number[][]} Matriz NxM de zeros.
+ * Gera uma matriz NxM, onde cada célula é preenchida por `value`.
+ * @param {number} n Número de linhas da matriz.
+ * @param {number} m Número de colunas da matriz.
+ * @param {*} value Valor que irá preencher as células da matriz.
+ * @returns {*[][]} Matriz NxM de zeros.
  */
-function matriz_vazia() {
+function matriz(n, m, value) {
     let cols = config.numeroDiasLetivos
     let rows = config.numeroHorarios
-    let array = []
-    let row = []
+    const array = []
+    const row = []
 
-    while (cols--) row.push(1)
+    while (cols--) row.push(value)
     while (rows--) array.push(row.slice())
     return array
 }
@@ -219,16 +222,9 @@ function matriz_vazia() {
  * ao input modificado.
  * @param {Event} evt Evento ativado quando o controle é modificado.
  */
-function registra_disponibilidade(evt) {
+function registra_disponibilidade(prof, horario, dia, evt) {
     console.log('disponibilidade')
-
-    const input = evt.target
-    const id = input.getAttribute('data-id')
-    const prof = get_professor(id)
-    const dia = Number.parseInt(input.getAttribute('data-dia'), 10)
-    const horario = Number.parseInt(input.getAttribute('data-horario'), 10)
-
-    prof.disponibilidade[horario][dia] = input.checked
+    prof.disponibilidade[horario][dia] = evt.target.checked
 }
 
 /**
@@ -238,7 +234,7 @@ function registra_disponibilidade(evt) {
  */
 function render_matriz(cell, prof) {
     if (!prof.hasOwnProperty('disponibilidade'))
-        prof.disponibilidade = matriz_vazia()
+        prof.disponibilidade = matriz(config.numeroHorarios, config.numeroDiasLetivos, true)
 
     const table = document.createElement('table')
     cell.appendChild(table)
@@ -276,10 +272,7 @@ function render_matriz(cell, prof) {
 
             checkbox.type = 'checkbox'
             checkbox.checked = prof.disponibilidade[i][j]
-            checkbox.setAttribute('data-dia', j)
-            checkbox.setAttribute('data-horario', i)
-            checkbox.setAttribute('data-id', prof.id)
-            checkbox.addEventListener('change', registra_disponibilidade, false)
+            checkbox.addEventListener('change', curry(registra_disponibilidade, prof, i, j), false)
         }
     }
 }
@@ -293,15 +286,27 @@ function render_professor(prof) {
     const table = document.getElementById('professores').getElementsByTagName('tbody')[0]
     const linha = table.insertRow(table.rows.length)
 
-    linha.setAttribute('data-id', prof.id)
-    linha.insertCell(0).innerHTML = prof.id
-    linha.insertCell(1).innerHTML = prof.nome
-    linha.insertCell(2).innerHTML = "<input type=number placeholder='Horas' class='horas-pref' min='0'/>"
-    linha.cells[2].getElementsByTagName('input')[0]
-        .addEventListener('change', registra_horas, false)
-    linha.insertCell(3).innerHTML = "<textarea placeholder='Disciplinas' class='disc-pref'></textarea>"
-    linha.cells[3].getElementsByTagName('textarea')[0]
-        .addEventListener('change', registra_discs, false)
+    const id = linha.insertCell(0)
+    id.appendChild(document.createTextNode(prof.id))
+
+    const nome = linha.insertCell(1)
+    nome.appendChild(document.createTextNode(prof.nome))
+
+    const horas = linha.insertCell(2)
+    const input_horas = document.createElement('input')
+    horas.appendChild(input_horas)
+
+    input_horas.placeholder = 'Horas'
+    input_horas.min = 0
+    input_horas.addEventListener('change', curry(registra_horas, prof), false)
+
+    const disciplinas = linha.insertCell(3)
+    const text_discs = document.createElement('textarea')
+    disciplinas.appendChild(text_discs)
+
+    text_discs.placeholder = 'Disciplinas'
+    text_discs.addEventListener('change', curry(registra_discs, prof), false)
+
     render_matriz(linha.insertCell(4), prof)
 }
 
@@ -321,15 +326,23 @@ function render_preferencias_professor() {
  */
 function render_disciplina(disc) {
     const table = document.getElementById('disciplinas').getElementsByTagName('tbody')[0]
-
     const linha = table.insertRow(table.rows.length)
-    linha.setAttribute('data-id', disc.id)
-    linha.insertCell(0).innerHTML = disc.id
-    linha.insertCell(1).innerHTML = disc.nome
-    linha.insertCell(2).innerHTML = disc.periodo
-    linha.insertCell(3).innerHTML = "<input type='checkbox' class='disc-dificil'/>"
-    linha.cells[3].getElementsByTagName('input')[0]
-        .addEventListener('change', registra_dificil, false)
+
+    const id = linha.insertCell(0)
+    id.appendChild(document.createTextNode(disc.id))
+
+    const nome = linha.insertCell(1)
+    nome.appendChild(document.createTextNode(disc.nome))
+
+    const periodo = linha.insertCell(2)
+    periodo.appendChild(document.createTextNode(disc.periodo))
+
+    const dificil = linha.insertCell(3)
+    const dificil_input = document.createElement('input')
+    dificil.appendChild(dificil_input)
+
+    dificil_input.type = 'checkbox'
+    dificil_input.addEventListener('change', curry(registra_dificil, disc), false)
 }
 
 /**
@@ -369,7 +382,7 @@ function enviar_json() {
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200)
-                console.log(xhr.responseText)
+                alert('Resposta recebida')
             else
                 alert('Erro no servidor')
         }
@@ -380,6 +393,13 @@ function enviar_json() {
     xhr.send(JSON.stringify(json))
 }
 
+/**
+ * Configura o valor do elemento para corresponder àquele em {@link config}.
+ * O Elemento precisa ter o atributo `data-field`, que irá corresponder à
+ * propriedade em `config`. O atributo `data-cat` é opcional, e se existir
+ * diz respeito ao objeto interno em `config`.
+ * @param {Element} element
+ */
 function set_param_value(element) {
     const param = element.getAttribute('data-field')
     let obj = config
