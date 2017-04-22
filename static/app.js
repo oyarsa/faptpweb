@@ -1,7 +1,9 @@
 /**
- * Objeto com os dados de entrada para o solver. Será modificado a partir
- * dos controles da interface (principalmente para informações indisponíveis
- * na entrada).
+ * Objeto com os dados de entrada para o solver. Será criado a partir do JSON submetido
+ * pelo usuário e modificado a partir dos controles da interface (principalmente para
+ * informações indisponíveis na entrada).
+ * Estão disponíveis um {@link https://github.com/oyarsa/faptp/raw/master/schemas/entrada_exemplo.json exemplo}
+ * e o {@link https://github.com/oyarsa/faptp/raw/master/schemas/entrada_schema.json schema}.
  */
 let entrada = null
 
@@ -9,14 +11,16 @@ let entrada = null
  * Objeto com os parâmetros de configuração para o solver. Será modificado
  * partir dos controles da interface, tendo uma valor default inicial.
  * @property {string} algoritmo Nome do algoritmo a ser utiliado.
- *    Valores possíveis: AG, HySST, SA-ILS, WDJU
+*    Valores possíveis: <tt>AG, HySST, SA-ILS, WDJU</tt>
  * @property {number} tempo Tempo de execução máximo, em segundos.
  * @property {object} parametros Parâmetros de configuração do algoritmo.
- *    Valores possíveis:
- *        AG: TaxaMut NIndiv %Cruz CruzOper NMut NTour GIter GNViz GAlfa
- *        HySST: MaxLevel TStart TStep IterHc IterMut
- *        SA-ILS: FracTime SAlfa t0 SAiter SAreaq SAchances ILSiter ILSpmax ILSp0
- *        WDJU: StagLimit JumpFactor
+ *     Valores possíveis:
+ *     <ul>
+ *        <li><tt>AG: TaxaMut, NIndiv, %Cruz, CruzOper, NMut, NTour, GIter, GNViz, GAlfa</tt></li>
+ *        <li><tt>HySST: MaxLevel, TStart, TStep, IterHc, IterMut</tt></li>
+ *        <li><tt>SA-ILS: FracTime, SAlfa, t0, SAiter, SAreaq, SAchances, ILSiter, ILSpmax, ILSp0</tt></li>
+ *        <li><tt>WDJU: StagLimit, JumpFactor </tt></li>
+ *     </ul>
  * @property {string} fo Qual a função a ser usada (preferências ou grades).
  *    Valores possíveis: pref, grades
  * @property {object} pesos Pesos da função objetivo, se for usada a de preferências.
@@ -76,14 +80,16 @@ let config = {
 }
 
 /**
- * Aplicação parcial (currying) de `fn`.
+ * Aplicação parcial (currying) de <tt>fn</tt>.
+ *
  * @example
- *    function mult(x, y) { return x * y}
- *    const multBy2= curry(mult, 2)
- *    multBy2(10) === 20
+ * const mult = (x, y) => x * y
+ * const multBy2 = curry(mult, 2)
+ * multBy2(10) === 20
+ *
  * @param {function} fn Função a ser parcialmente aplicada.
- * @param {...*} args1 Os primeiros argumentos de `fn`
- * @returns {function} Uma função que recebe os argumentos restantes, aplicando `args1`
+ * @param {...*} args1 Os primeiros argumentos de fn
+ * @returns {function} Uma função que recebe os argumentos restantes, aplicando args1
  *                     juntamente com eles para de fato executar a função.
  */
 function curry(fn, ...args1) {
@@ -92,7 +98,7 @@ function curry(fn, ...args1) {
 
 /**
  * Recebe o JSON enviado como entrada via upload, armazenando
- * no objeto global `entrada`.
+ * no objeto global {@link entrada}.
  * @param {Event} evt Evento ativado quando um arquivo for enviado.
  */
 function recebe_upload(evt) {
@@ -109,8 +115,8 @@ function recebe_upload(evt) {
 /**
  * Registra mudança na configuração para parâmetros numéricos, transportando
  * o novo valor para o objeto {@link config}. Para isso, o input deve possuir
- * a classe `numeric-conf`, além do atributo `data-field`, que diz a  qual
- * campo do objeto ele diz respeito. O atributo `data-cat` é usado para indicar
+ * a classe <tt>numeric-conf</tt>, além do atributo <tt>data-field</tt>, que diz a  qual
+ * campo do objeto ele diz respeito. O atributo <tt>data-cat</tt> é usado para indicar
  * a qual sub-objeto ele pertence, mas é opcional.
  * @param {Event} evt Evento ativado quando o input é modificado.
  */
@@ -145,8 +151,8 @@ function handle_algo(evt) {
 
 /**
  * Registra mudança no tipo de fo selecionada, mostrando os inputs para os
- * pesos se 'Preferências' for selecionado, ou então mostrando os parâmetros
- * do GRASP se 'Grade' for selecionado.
+ * pesos se <tt>Preferências</tt> for selecionado, ou então mostrando os parâmetros
+ * do GRASP se <tt>Grade</tt> for selecionado.
  * @param {Event} evt Evento ativado quando o select de fo é modificado.
  */
 function handle_fo(evt) {
@@ -200,20 +206,18 @@ function registra_dificil(disc, evt) {
 }
 
 /**
- * Gera uma matriz NxM, onde cada célula é preenchida por `value`.
+ * Gera uma matriz <tt>n x m</tt>, onde cada célula é preenchida por <tt>value</tt>.
  * @param {number} n Número de linhas da matriz.
  * @param {number} m Número de colunas da matriz.
  * @param {*} value Valor que irá preencher as células da matriz.
- * @returns {*[][]} Matriz NxM de zeros.
+ * @returns {Array<Array>} Matriz <tt>n x m</tt> de zeros.
  */
 function matriz(n, m, value) {
-    let cols = config.numeroDiasLetivos
-    let rows = config.numeroHorarios
     const array = []
     const row = []
 
-    while (cols--) row.push(value)
-    while (rows--) array.push(row.slice())
+    while (m--) row.push(value)
+    while (n--) array.push(row.slice())
     return array
 }
 
@@ -228,7 +232,7 @@ function registra_disponibilidade(prof, horario, dia, evt) {
 }
 
 /**
- * Desenha a matriz de disponibilidades do professor `prof` no elemento `cell`.
+ * Desenha a matriz de disponibilidades do professor <tt>prof</tt> no elemento <tt>cell</tt>.
  * @param {Element} cell Elemento onde a matriz será desenhada.
  * @param {object} prof Professor cuja matriz será desenhada.
  */
@@ -381,24 +385,44 @@ function enviar_json() {
     const xhr = new XMLHttpRequest()
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
+            const res = JSON.parse(xhr.responseText)
             if (xhr.status === 200)
-                alert('Resposta recebida')
+                disponibilizar_solucao(res)
             else
-                alert('Erro no servidor')
+                alert('Erro no servidor: ' + res.message)
         }
-        console.log(xhr.responseText)
     }
     xhr.open('POST', '/gerar_horario', true)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.send(JSON.stringify(json))
 }
 
+function disponibilizar_solucao(res) {
+    const solucao = document.createElement('div')
+    solucao.id = 'solucao'
+    document.querySelector('body').appendChild(solucao)
+
+    const texto = document.createElement('h2')
+    solucao.appendChild(texto)
+    texto.textContent = `Seu código: ${res.id}`
+
+    texto.appendChild(document.createElement('br'))
+
+    const url = document.createElement('a');
+    texto.appendChild(url);
+    url.href = window.URL.createObjectURL(new Blob([res.saida], { type: 'text/json' }))
+    url.download = 'saida.json'
+    url.textContent = 'Resultado'
+
+    window.location.href = '#solucao'
+}
+
 /**
  * Configura o valor do elemento para corresponder àquele em {@link config}.
- * O Elemento precisa ter o atributo `data-field`, que irá corresponder à
- * propriedade em `config`. O atributo `data-cat` é opcional, e se existir
- * diz respeito ao objeto interno em `config`.
- * @param {Element} element
+ * O Elemento precisa ter o atributo <tt>data-field</tt>, que irá corresponder à
+ * propriedade em <tt>config</tt>. O atributo <tt>data-cat</tt> é opcional, e se existir
+ * diz respeito ao objeto interno em <tt>config</tt>.
+ * @param {Element} element Elemento a ser configurado.
  */
 function set_param_value(element) {
     const param = element.getAttribute('data-field')
