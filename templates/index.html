@@ -45,7 +45,7 @@
         <div id="algo-div">
             <label for="algoritmo-select">Algoritmo</label>
             <select id="algoritmo-select">
-                <option value="AG" selected>Algoritmo Genético</option>
+                <option value="AG">Algoritmo Genético</option>
                 <option value="HySST">HySST</option>
                 <option value="SA-ILS">SA-ILS</option>
                 <option value="WDJU">Walk Down Jump Up</option>
@@ -54,13 +54,13 @@
 
         <div id="tempo-div">
             <label for="tempo">Tempo (segundos)</label>
-            <input type="number" id="tempo" min="1" value="180" class="numeric-conf" data-field="tempo" />
+            <input type="number" id="tempo" min="1" class="numeric-conf" data-field="tempo" />
         </div>
 
         <div id="fo-div">
             <label for="fo-select">Função objetivo</label>
             <select id="fo-select">
-                <option value="pref" selected>Preferências</option>
+                <option value="pref">Preferências</option>
                 <option value="grade">Grade</option>
             </select>
         </div>
@@ -71,32 +71,32 @@
             <div data-cat="AG" class="algo-div">
                 <div>
                     <label for="ag-num-indiv">[AG] Número de indivíduos</label>
-                    <input type="number" id="ag-num-indiv" min="1" value="20" class="numeric-conf"
+                    <input type="number" id="ag-num-indiv" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="NIndiv" />
                 </div>
 
                 <div>
                     <label for="ag-num-iter">[AG] Número de iterações sem melhoria</label>
-                    <input type="number" id="ag-num-iter" min="1" value="20" class="numeric-conf"
+                    <input type="number" id="ag-num-iter" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="AGIter" />
                 </div>
 
                 <div>
                     <label for="ag-porc-cruz">[AG] Porcentagem de cruzamentos</label>
-                    <input type="number" id="ag-porc-cruz" min="1" value="30" class="numeric-conf"
+                    <input type="number" id="ag-porc-cruz" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="%Cruz" />
                 </div>
 
                 <div>
                     <label for="ag-taxa-mut">[AG] Taxa de mutação</label>
-                    <input type="number" id="ag-taxa-mut" min="1" value="15" class="numeric-conf"
+                    <input type="number" id="ag-taxa-mut" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="TaxaMut" />
                 </div>
 
                 <div>
                     <label for="ag-cruz-op">[AG] Operador de cruzamento</label>
                     <select id="ag-cruz-op" data-cat="parametros" data-field="CruzOper">
-                        <option value="CX" selected>Cycle Crossover</option>
+                        <option value="CX">Cycle Crossover</option>
                         <option value="OX">Order Crossover</option>
                         <option value="PMX">Partially Mapped Crossover</option>
                     </select>
@@ -104,13 +104,13 @@
 
                 <div>
                     <label for="ag-tent-mut">[AG] Tentativas de mutação</label>
-                    <input type="number" id="ag-tent-mut" min="1" value="4" class="numeric-conf"
+                    <input type="number" id="ag-tent-mut" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="NMut" />
                 </div>
 
                 <div>
                     <label for="ag-tam-torneio">[AG] Tamanho do torneio</label>
-                    <input type="number" id="ag-tam-torneio" min="1" value="4" class="numeric-conf"
+                    <input type="number" id="ag-tam-torneio" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="NTour" />
                 </div>
             </div>
@@ -118,31 +118,31 @@
             <div data-cat="HySST" hidden class="algo-div">
                 <div>
                     <label for="hysst-max-level">[HySST] Max level</label>
-                    <input type="number" id="hysst-max-level" min="1" value="15" class="numeric-conf"
+                    <input type="number" id="hysst-max-level" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="MaxLevel" />
                 </div>
 
                 <div>
                     <label for="hysst-thres-start">[HySST] Threshold start</label>
-                    <input type="number" id="hysst-thres-start" min="1" value="5" class="numeric-conf"
+                    <input type="number" id="hysst-thres-start" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="TStart" />
                 </div>
 
                 <div>
                     <label for="hysst-thres-step">[HySST] Threshold step</label>
-                    <input type="number" id="hysst-thres-step" min="1" value="5" class="numeric-conf"
+                    <input type="number" id="hysst-thres-step" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="TStep" />
                 </div>
 
                 <div>
                     <label for="hysst-iter-hc">[HySST] Iterações hill climbing</label>
-                    <input type="number" id="hysst-iter-hc" min="1" value="5" class="numeric-conf"
+                    <input type="number" id="hysst-iter-hc" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="IterHc" />
                 </div>
 
                 <div>
                     <label for="hysst-iter-neigh">[HySST] Iterações vizinhança</label>
-                    <input type="number" id="hysst-iter-neigh" min="1" value="5" class="numeric-conf"
+                    <input type="number" id="hysst-iter-neigh" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="IterMut" />
                 </div>
             </div>
@@ -150,31 +150,31 @@
             <div data-cat="SA-ILS" hidden class="algo-div">
                 <div>
                     <label for="sails-timeout">[SA/ILS] Timeout por execução (fração do total)</label>
-                    <input type="number" id="sails-timeout" min="1" value="100" class="numeric-conf"
+                    <input type="number" id="sails-timeout" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="FracTime" />
                 </div>
 
                 <div>
                     <label for="sails-sa-alfa">[SA] Alfa</label>
-                    <input type="number" id="sails-sa-alfa" min="0.001" step="0.001" value="0.97" class="numeric-conf"
+                    <input type="number" id="sails-sa-alfa" min="0.001" step="0.001" class="numeric-conf"
                            data-cat="parametros" data-field="SAlfa" />
                 </div>
 
                 <div>
                     <label for="sails-sa-temp0">[SA] Temperatura inicial</label>
-                    <input type="number" id="sails-sa-temp0" min="0.1" step="0.1" value="1" class="numeric-conf"
+                    <input type="number" id="sails-sa-temp0" min="0.1" step="0.1" class="numeric-conf"
                            data-cat="parametros" data-field="t0" />
                 </div>
 
                 <div>
                     <label for="sails-sa-iter">[SA] Iterações</label>
-                    <input type="number" id="sails-sa-iter" min="1" value="100" class="numeric-conf"
+                    <input type="number" id="sails-sa-iter" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="SAiter" />
                 </div>
 
                 <div>
                     <label for="sails-sa-reaq">[SA] Reaquecimentos</label>
-                    <input type="number" id="sails-sa-reaq" min="1" value="250" class="numeric-conf"
+                    <input type="number" id="sails-sa-reaq" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="SAreaq" />
                 </div>
 
@@ -182,26 +182,26 @@
                     <label for="sails-sa-chances-viz">[SA] Chances das vizinhanças</label>
                     <select id="sails-sa-chances-viz" class="numeric-conf"
                             data-cat="parametros" data-field="SAchances">
-                        <option value="0" selected>25, 43, 20, 10, 2</option>
+                        <option value="0">25, 43, 20, 10, 2</option>
                         <option value="1">35, 43, 10, 5, 7</option>
                     </select>
                 </div>
 
                 <div>
                     <label for="sails-ils-iter">[ILS] Iterações</label>
-                    <input type="number" id="sails-ils-iter" min="1" value="10" class="numeric-conf"
+                    <input type="number" id="sails-ils-iter" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="ILSiter" />
                 </div>
 
                 <div>
                     <label for="sails-ils-max-pert">[ILS] Máximo de perturbações</label>
-                    <input type="number" id="sails-ils-max-pert" min="1" value="10" class="numeric-conf"
+                    <input type="number" id="sails-ils-max-pert" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="ILSpmax" />
                 </div>
 
                 <div>
                     <label for="sails-ils-init-pert">[ILS] Inicial de perturbações</label>
-                    <input type="number" id="sails-ils-init-pert" min="0" value="1" class="numeric-conf"
+                    <input type="number" id="sails-ils-init-pert" min="0" class="numeric-conf"
                            data-cat="parametros" data-field="ILSp0" />
                 </div>
             </div>
@@ -209,13 +209,13 @@
             <div data-cat="WDJU" hidden class="algo-div">
                 <div>
                     <label for="wdju-stagnation">[WDJU] Stagnation limit</label>
-                    <input type="number" id="wdju-stagnation" min="1" value="10" class="numeric-conf"
+                    <input type="number" id="wdju-stagnation" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="StagLimit" />
                 </div>
 
                 <div>
                     <label for="wdju-jump">[WDJU] Jump factor</label>
-                    <input type="number" id="wdju-jump" min="0.001" value="0.001" step="0.001" class="numeric-conf"
+                    <input type="number" id="wdju-jump" min="0.001" step="0.001" class="numeric-conf"
                            data-cat="parametros" data-field="JumpFactor" />
                 </div>
             </div>
@@ -223,19 +223,19 @@
             <div data-cat="GRASP" hidden id="grasp-div">
                 <div>
                     <label for="grasp-num-iter">[GRASP] Número de iterações sem melhoria</label>
-                    <input type="number" id="grasp-num-iter" min="1" value="15" class="numeric-conf"
+                    <input type="number" id="grasp-num-iter" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="GIter" />
                 </div>
 
                 <div>
                     <label for="grasp-num-viz">[GRASP] Número de vizinhos</label>
-                    <input type="number" id="grasp-num-viz" min="1" value="4" class="numeric-conf"
+                    <input type="number" id="grasp-num-viz" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="GNViz" />
                 </div>
 
                 <div>
                     <label for="grasp-alfa">[GRASP] Alfa (%)</label>
-                    <input type="number" id="grasp-alfa" min="1" value="20" class="numeric-conf"
+                    <input type="number" id="grasp-alfa" min="1" class="numeric-conf"
                            data-cat="parametros" data-field="GAlfa" />
                 </div>
             </div>
@@ -246,55 +246,55 @@
 
             <div>
                 <label for="pesos-janelas">Janelas</label>
-                <input type="number" id="pesos-janelas" min="0" step="0.001" value="2" class="numeric-conf"
+                <input type="number" id="pesos-janelas" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="Janelas"/>
             </div>
 
             <div>
                 <label for="pesos-intervalos-trabalho">Intervalos de Trabalho</label>
-                <input type="number" id="pesos-intervalos-trabalho" min="0" step="0.001" value="1.5" class="numeric-conf"
+                <input type="number" id="pesos-intervalos-trabalho" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="IntervalosTrabalho" />
             </div>
 
             <div>
                 <label for="pesos-curriculo-compacto">Currículo compacto</label>
-                <input type="number" id="pesos-curriculo-compacto" min="0" step="0.001" value="3.5" class="numeric-conf"
+                <input type="number" id="pesos-curriculo-compacto" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="NumDiasAula" />
             </div>
 
             <div>
                 <label for="pesos-sabado">Aulas aos sábados</label>
-                <input type="number" id="pesos-sabado" min="0" step="0.001" value="4.667" class="numeric-conf"
+                <input type="number" id="pesos-sabado" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="AulasSabado" />
             </div>
 
             <div>
                 <label for="pesos-aulas-seguidas">Aulas seguidas da mesma disciplina</label>
-                <input type="number" id="pesos-aulas-seguidas" min="0" step="0.001" value="4" class="numeric-conf"
+                <input type="number" id="pesos-aulas-seguidas" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="AulasSeguidas" />
             </div>
 
             <div>
                 <label for="pesos-aulas-seguidas-dificil">Aulas seguidas de disciplinas difícieis</label>
-                <input type="number" id="pesos-aulas-seguidas-dificil" min="0" step="0.001" value="2.5" class="numeric-conf"
+                <input type="number" id="pesos-aulas-seguidas-dificil" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="AulasSeguidasDificil" />
             </div>
 
             <div>
                 <label for="pesos-aula-dificil-ultimo">Aula difícil no último horário</label>
-                <input type="number" id="pesos-aula-dificil-ultimo" min="0" step="0.001" value="2.333" class="numeric-conf"
-                       data-cat="pesos" data-field="AulasDificilUltimoHorario" />
+                <input type="number" id="pesos-aula-dificil-ultimo" min="0" step="0.001" class="numeric-conf"
+                       data-cat="pesos" data-field="AulaDificilUltimoHorario" />
             </div>
 
             <div>
                 <label for="pesos-prof-disc">Preferências dos professores (disciplinas)</label>
-                <input type="number" id="pesos-prof-disc" min="0" step="0.001" value="3.167" class="numeric-conf"
+                <input type="number" id="pesos-prof-disc" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="PreferenciasProfessores" />
             </div>
 
             <div>
                 <label for="pesos-prof-aulas">Preferências dos professores (número de aulas)</label>
-                <input type="number" id="pesos-prof-aulas" min="0" step="0.001" value="1.667" class="numeric-conf"
+                <input type="number" id="pesos-prof-aulas" min="0" step="0.001" class="numeric-conf"
                        data-cat="pesos" data-field="AulasProfessores" />
             </div>
         </div>
@@ -304,12 +304,12 @@
 
             <div>
                 <label for="dias-letivos">Número de dias letivos por semana</label>
-                <input type="number" id="dias-letivos" min="1" value="6" class="numeric-conf" data-field="numeroDiasLetivos" />
+                <input type="number" id="dias-letivos" min="1" class="numeric-conf" data-field="numeroDiasLetivos" />
             </div>
 
             <div>
                 <label for="horarios-dia">Número de horários por dia</label>
-                <input type="number" id="horarios-dia" min="1" value="4" class="numeric-conf" data-field="numeroHorarios" />
+                <input type="number" id="horarios-dia" min="1" class="numeric-conf" data-field="numeroHorarios" />
             </div>
         </div>
     </div>
