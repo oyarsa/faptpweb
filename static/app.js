@@ -76,7 +76,9 @@ let config = {
         AulasProfessores: 1.667
     },
     numeroHorarios: 4,
-    numeroDiasLetivos: 6
+    numeroDiasLetivos: 6,
+    numeroAlunos: 1392,
+    numeroPeriodos: 33
 }
 
 /**
