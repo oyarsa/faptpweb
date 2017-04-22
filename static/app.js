@@ -233,7 +233,7 @@ function registra_disponibilidade(prof, horario, dia, evt) {
 
 /**
  * Desenha a matriz de disponibilidades do professor <tt>prof</tt> no elemento <tt>cell</tt>.
- * @param {Element} cell Elemento onde a matriz será desenhada.
+ * @param {Node} cell Elemento onde a matriz será desenhada.
  * @param {object} prof Professor cuja matriz será desenhada.
  */
 function render_matriz(cell, prof) {

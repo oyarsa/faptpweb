@@ -1,7 +1,13 @@
+/**
+ * Registra evento de pesquisa.
+ */
 window.onload = () => {
     document.getElementById('solucao-pesquisar').addEventListener('click', pesquisar, false)
 }
 
+/**
+ * Faz requisição para o endpoint de pesquisa.
+ */
 function pesquisar() {
     const id = Number.parseInt(document.getElementById('solucao-id').value)
 
@@ -19,6 +25,14 @@ function pesquisar() {
     xhr.send()
 }
 
+/**
+ * Cria um elemento contendo um link para um arquivo na memória contendo
+ * uma string de um JSON.
+ * @param {string} data String de um JSON.
+ * @param {string} filename Nome do arquivo.
+ * @param {string} text Texto do link.
+ * @returns {HTMLAchorElement} Elemento âncora com link para o arquvo na memória.
+ */
 function json_file_download(data, filename, text) {
     const url = document.createElement('a');
     url.href = window.URL.createObjectURL(new Blob([data], { type: 'text/json' }))
@@ -27,6 +41,11 @@ function json_file_download(data, filename, text) {
     return url
 }
 
+/**
+ * Mostra links para download dos objetos da resposta do serivdor.
+ * @param {object} res Resposta contendo três sub-objetos:
+ *     <tt>input</tt>, <tt>configuracao</tt> e <tt>saida</tt>.
+ */
 function disponibilizar_solucao(res) {
     const solucao = document.getElementById('solucao')
     solucao.innerHTML = ""
