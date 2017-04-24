@@ -1,4 +1,5 @@
 import os
+import random
 import pprint
 import json
 import sys
@@ -20,12 +21,72 @@ CONFIG_FILE = 'conftemp'
 app = Flask(__name__)
 
 
+def disciplinas_periodo(periodo):
+    disciplinas = set()
+    for e in periodo['eventos']:
+        disciplinas.add(e['disciplina'])
+    return disciplinas
+
+
+def disciplinas_cores(disciplinas):
+    NOME_CORES = [
+        'vermelho', 'amarelo', 'azul', 'verde', 'roxo', 'rosa', 'cinza',
+        'azul2', 'cinza2'
+    ]
+    cores = random.sample(NOME_CORES, len(disciplinas))
+    disc_cores = {}
+
+    for i, d in enumerate(disciplinas):
+        disc_cores[d] = cores[i]
+
+    return disc_cores
+
+
+def cores_periodo(periodo):
+    return disciplinas_cores(disciplinas_periodo(periodo))
+
+
+def matriz_vazia(rows, cols):
+    return [[None for _ in range(cols)] for _ in range(rows)]
+
+
+def carregar_periodos(horarios, num_horarios, num_dias):
+    periodos = []
+
+    for periodo in horarios['periodos']:
+        nome = periodo['nome']
+        matriz = matriz_vazia(num_horarios, num_dias)
+        cores = cores_periodo(periodo)
+
+        for e in periodo['eventos']:
+            dia = int(e['dia'])
+            horario = int(e['horario'])
+            matriz[horario][dia] = {
+                'prof': e['professor'],
+                'disc': e['disciplina'],
+                'cor': cores[e['disciplina']]
+            }
+
+        periodos.append((nome, matriz))
+
+    def sort_func(tup):
+        nome, _ = tup
+        try:
+            turma, curso = nome.split('-')
+            return curso, turma
+        except ValueError:
+            return nome
+
+    return sorted(periodos, key=sort_func)
+
+
 def init_db():
     "Inicializa o banco, criando a tabela se ela não existir"
     conn = sqlite3.connect(DBNAME)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS Solucoes
-                (id INTEGER PRIMARY KEY, entrada TEXT, config TEXT, saida TEXT)''')
+                (id INTEGER PRIMARY KEY, entrada TEXT, config TEXT, saida TEXT)'''
+              )
     conn.commit()
     conn.close()
 
@@ -38,9 +99,8 @@ def insert_solucao(entrada, config, saida):
     """
     entrada = json.dumps(entrada)
     config = json.dumps(config)
-    saida = json.dumps(saida)
-    sql = '''INSERT INTO Solucoes (entrada, config, saida)
-             VALUES (?, ?, ?)'''
+    sql = '''INSERT INTO Solucoes (id, entrada, config, saida)
+             VALUES (NULL, ?, ?, ?)'''
 
     conn = sqlite3.connect(DBNAME)
     c = conn.cursor()
@@ -58,14 +118,15 @@ def recupera_solucao(pk):
 
     conn = sqlite3.connect(DBNAME)
     c = conn.cursor()
-    c.execute(sql, (pk,))
+    c.execute(sql, (pk, ))
     tupla = c.fetchone()
 
     if tupla is None:
         result = None
     else:
         key, entrada, config, saida = tupla
-        result = dict(id=key, entrada=entrada, configuracao=config, saida=saida)
+        result = dict(
+            id=key, entrada=entrada, configuracao=config, saida=saida)
 
     conn.close()
     return result
@@ -173,6 +234,25 @@ def solucao(key):
         return error(400, "Solução não encontrada")
     else:
         return jsonify(dados)
+
+
+@app.route('/horario/<int:key>')
+def horario(key):
+    dados = recupera_solucao(key)
+    if dados is None:
+        print('Solução não encontrada')
+        return error(400, "Solução não encontrada")
+    else:
+        dias = [
+            'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado',
+            'Domingo'
+        ]
+        config = json.loads(dados['configuracao'])
+        solucao = json.loads(dados['saida'])
+        num_horarios = int(config['numeroHorarios'])
+        num_dias = int(config['numeroDiasLetivos'])
+        periodos = carregar_periodos(solucao, num_horarios, num_dias)
+        return render_template('horario.html', periodos=periodos, dias=dias)
 
 
 if __name__ == '__main__':

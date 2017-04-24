@@ -200,11 +200,22 @@ function registra_discs(prof, evt) {
  * Modifica a dificuldade da disciplina (se é ou não difícil) a quem
  * o input modificado pertence.
  * @param {object} disc Disciplina a quem pertence o input de dificuldade.
- * @param {Event} evt Evento ativado quando a dificuldade da disciplina é modificada
+ * @param {Event} evt Evento ativado quando a dificuldade da disciplina é modificada.
  */
 function registra_dificil(disc, evt) {
     console.log('dificil')
     disc.dificil = evt.target.checked
+}
+
+/**
+ * Modifica a oferta da disciplina (se é ou não ofertada) a quem
+ * o input modificado pertence.
+ * @param {object} disc Disciplina a quem pertence o input de dificuldade.
+ * @param {Event} evt Evento ativado quando a ofertada da disciplina é modificada.
+ */
+function registra_ofertada(disc, evt) {
+    console.log('ofertada')
+    disc.ofertada = evt.target.checked
 }
 
 /**
@@ -348,7 +359,16 @@ function render_disciplina(disc) {
     dificil.appendChild(dificil_input)
 
     dificil_input.type = 'checkbox'
+    dificil_input.checked = !!disc.dificil
     dificil_input.addEventListener('change', curry(registra_dificil, disc), false)
+
+    const ofertada = linha.insertCell(4)
+    const ofertada_input = document.createElement('input')
+    ofertada.appendChild(ofertada_input)
+
+    ofertada_input.type = 'checkbox'
+    ofertada_input.checked = disc.ofertada
+    ofertada_input.addEventListener('change', curry(registra_ofertada, disc), false)
 }
 
 /**
@@ -360,6 +380,11 @@ function render_disciplinas_dificeis() {
     entrada.disciplinas.forEach(render_disciplina)
 }
 
+/**
+ * Calcula o número de períodos/turmas/currículos a partir das disciplinas
+ * na entrada.
+ * @returns {number}  Número de períodos/turmas/currículos.
+ */
 function calcular_numero_periodos() {
      return new Set(entrada.disciplinas.filter(d => d.ofertada).map(d => d.periodo)).size
 }
@@ -370,7 +395,10 @@ function calcular_numero_periodos() {
  */
 function load_file() {
     config.numeroAlunos = entrada.alunoperfis.length
+    document.getElementById('numero-alunos').value = config.numeroAlunos
     config.numeroPeriodos = calcular_numero_periodos()
+    document.getElementById('numero-periodos').value = config.numeroPeriodos
+
     render_preferencias_professor()
     render_disciplinas_dificeis()
 }
@@ -384,6 +412,8 @@ function enviar_json() {
         alert('Selecione um arquivo de entrada.')
         return
     }
+
+    document.getElementById('solucao').innerHTML = ''
 
     const json = {
         'entrada': entrada,
@@ -405,6 +435,13 @@ function enviar_json() {
     xhr.send(JSON.stringify(json))
 }
 
+/**
+ * Cria um link para download da solução enviada pelo servidor como um arquivo
+ * JSON.
+ * @param {object} res Resposta do servidor.
+ * @param {number} res.id Identificação da solução.
+ * @param {object} res.saida JSON com a solução.
+ */
 function disponibilizar_solucao(res) {
     const solucao = document.getElementById('solucao')
     solucao.innerHTML = ""
@@ -415,11 +452,18 @@ function disponibilizar_solucao(res) {
 
     texto.appendChild(document.createElement('br'))
 
-    const url = document.createElement('a');
-    texto.appendChild(url);
+    const url = document.createElement('a')
+    texto.appendChild(url)
     url.href = window.URL.createObjectURL(new Blob([res.saida], { type: 'text/json' }))
     url.download = 'saida.json'
     url.textContent = 'Resultado'
+
+    texto.appendChild(document.createElement('br'))
+
+    const html = document.createElement('a')
+    texto.appendChild(html)
+    html.href = `/horario/${res.id}`
+    html.textContent = 'Visualizar horário'
 
     window.location.href = '#solucao'
 }
@@ -450,6 +494,8 @@ window.onload = function() {
 
     document.querySelectorAll('.numeric-conf')
         .forEach(e => e.addEventListener('change', handle_numeric_config, false))
+    document.querySelectorAll('.matrix-size')
+        .forEach(e => e.addEventListener('change', render_preferencias_professor, false))
 
     document.getElementById('algoritmo-select').addEventListener('change', handle_algo, false)
     document.getElementById('fo-select').addEventListener('change', handle_fo, false)
