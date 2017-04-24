@@ -26,6 +26,8 @@ let entrada = null
  * @property {object} pesos Pesos da função objetivo, se for usada a de preferências.
  * @property {number} numeroDiasLetivos Número de dias letivos por semana.
  * @property {number} numeroHorarios Número de horários por dia.
+ * @property {number} numeroPeriodos Número de períodos/turmas/currículos.
+ * @property {number} numeroAlunos Número de alunos matriculados.
  */
 let config = {
     algoritmo: 'AG',
@@ -76,9 +78,7 @@ let config = {
         AulasProfessores: 1.667
     },
     numeroHorarios: 4,
-    numeroDiasLetivos: 6,
-    numeroAlunos: 1392,
-    numeroPeriodos: 33
+    numeroDiasLetivos: 6
 }
 
 /**
@@ -360,11 +360,17 @@ function render_disciplinas_dificeis() {
     entrada.disciplinas.forEach(render_disciplina)
 }
 
+function calcular_numero_periodos() {
+     return new Set(entrada.disciplinas.filter(d => d.ofertada).map(d => d.periodo)).size
+}
+
 /**
  * Carrega as tabelas de disciplinas e professores a partir da entrada
  * recém recebida.
  */
 function load_file() {
+    config.numeroAlunos = entrada.alunoperfis.length
+    config.numeroPeriodos = calcular_numero_periodos()
     render_preferencias_professor()
     render_disciplinas_dificeis()
 }
