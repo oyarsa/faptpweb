@@ -4,331 +4,537 @@
 <head>
     <meta charset="utf-8">
     <title>faptp</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bulma.css') }}" />
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </head>
 
 <body>
-    <p>Fazer upload do arquivo de entrada</p>
-    <input type="file" accept=".json" id="entrada-upload" />
-    <button id="gerar-btn">Gerar horário</button>
+    <section class="section">
+        <div class="container">
+            <p class="title is-2">Gerar horário <a href="/pesquisar">Pesquisar horário</a></p>
+            <div class="box">
+                <div class="content">
+                    <p>Fazer upload do arquivo de entrada</p>
+                </div>
 
-    <table id="professores">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>Horas desejadas</th>
-                <th>Disciplinas preferidas</th>
-                <th>Disponibilidade</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+                <input type="file" accept=".json" id="entrada-upload" />
+                <button id="gerar-btn" class="button is-primary">Gerar horário</button>
+            </div>
 
-    <table id="disciplinas">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>Período</th>
-                <th>Difícil</th>
-                <th>Ofertada</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+            <div class="tabs is-fullwidth is-medium">
+                <ul>
+                    <li class="is-active tab-link" data-name="professores">
+                        <a href="#">Professores</a>
+                    </li>
+                    <li class="tab-link" data-name="disciplinas">
+                        <a href="#">Disciplinas</a>
+                    </li>
+                </ul>
+            </div>
 
-    <div id="configuracao">
-        <h2>Configuração</h2>
+            <table id="professores" class="table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Horas desejadas</th>
+                        <th>Disciplinas preferidas</th>
+                        <th>Disponibilidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
 
-        <div id="algo-div">
-            <label for="algoritmo-select">Algoritmo</label>
-            <select id="algoritmo-select">
-                <option value="AG">Algoritmo Genético</option>
-                <option value="HySST">HySST</option>
-                <option value="SA-ILS">SA-ILS</option>
-                <option value="WDJU">Walk Down Jump Up</option>
-            </select>
+            <table id="disciplinas" class="table" hidden>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Período</th>
+                        <th>Difícil</th>
+                        <th>Ofertada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+            <div id="configuracao">
+                <p class="title">Configuração</p>
+
+                <div class="columns">
+                    <div class="column is-half">
+                        <div>
+                            <div id="algo-div" class="field">
+                                <label for="algoritmo-select" class="label">Algoritmo</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select id="algoritmo-select">
+                                            <option value="AG">Algoritmo Genético</option>
+                                            <option value="HySST">HySST</option>
+                                            <option value="SA-ILS">SA-ILS</option>
+                                            <option value="WDJU">Walk Down Jump Up</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tempo-div" class="field">
+                                <label for="tempo" class="label">Tempo (segundos)</label>
+                                <div class="control">
+                                    <input type="number" id="tempo" min="1" class="numeric-conf input" data-field="tempo" />
+                                </div>
+                            </div>
+
+                            <div id="fo-div" class="field">
+                                <label for="fo-select" class="label">Função objetivo</label>
+                                <div class="select is-fullwidth">
+                                    <select id="fo-select">
+                                        <option value="pref">Preferências</option>
+                                        <option value="grade">Grade</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                <hr/>
+
+                <div id="param-div">
+                    <h2 class="subtitle is-4">Parâmetros dos algoritmos</h2>
+
+                    <div data-cat="AG" class="algo-div">
+                        <div class="field">
+                            <label for="ag-num-indiv" class="label">
+                                <span class="tag is-black">AG</span>
+                                Número de indivíduos
+                            </label>
+                            <div class="control">
+                                <input type="number" id="ag-num-indiv" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="NIndiv" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="ag-num-iter" class="label">
+                                <span class="tag is-black">AG</span>
+                                Número de iterações sem melhoria
+                            </label>
+                            <div class="control">
+                                <input type="number" id="ag-num-iter" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="AGIter" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="ag-porc-cruz" class="label">
+                                <span class="tag is-black">AG</span>
+                                Porcentagem de cruzamentos
+                            </label>
+                            <div class="control">
+                                <input type="number" id="ag-porc-cruz" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="%Cruz" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="ag-taxa-mut" class="label">
+                                <span class="tag is-black">AG</span>
+                                Taxa de mutação
+                            </label>
+                            <div class="control">
+                                <input type="number" id="ag-taxa-mut" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="TaxaMut" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="ag-cruz-op" class="label">
+                                <span class="tag is-black">AG</span>
+                                Operador de cruzamento
+                            </label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="ag-cruz-op" data-cat="parametros" data-field="CruzOper">
+                                        <option value="CX">Cycle Crossover</option>
+                                        <option value="OX">Order Crossover</option>
+                                        <option value="PMX">Partially Mapped Crossover</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="ag-tent-mut" class="label">
+                                <span class="tag is-black">AG</span>
+                                Tentativas de mutação
+                            </label>
+                            <div class="control">
+                                <input type="number" id="ag-tent-mut" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="NMut" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="ag-tam-torneio" class="label">
+                                <span class="tag is-black">AG</span>
+                                Tamanho do torneio
+                            </label>
+                            <div class="control">
+                                <input type="number" id="ag-tam-torneio" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="NTour" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-cat="HySST" hidden class="algo-div">
+                        <div class="field">
+                            <label for="hysst-max-level" class="label">
+                                <span class="tag is-primary">HySST</span>
+                                Max level
+                            </label>
+                            <div class="control">
+                                <input type="number" id="hysst-max-level" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="MaxLevel" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="hysst-thres-start" class="label">
+                                <span class="tag is-primary">HySST</span>
+                                Threshold start
+                            </label>
+                            <div class="control">
+                                <input type="number" id="hysst-thres-start" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="TStart" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="hysst-thres-step" class="label">
+                                <span class="tag is-primary">HySST</span>
+                                Threshold step
+                            </label>
+                            <div class="control">
+                                <input type="number" id="hysst-thres-step" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="TStep" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="hysst-iter-hc" class="label">
+                                <span class="tag is-primary">HySST</span>
+                                Iterações hill climbing
+                            </label>
+                            <div class="control">
+                                <input type="number" id="hysst-iter-hc" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="IterHc" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="hysst-iter-neigh" class="label">
+                                <span class="tag is-primary">HySST</span>
+                                Iterações vizinhança
+                            </label>
+                            <div class="control">
+                                <input type="number" id="hysst-iter-neigh" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="IterMut" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-cat="SA-ILS" hidden class="algo-div">
+                        <div class="field">
+                            <label for="sails-timeout" class="label">
+                                <span class="tag is-info">SA/ILS</span>
+                                Timeout por execução (fração do total)
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-timeout" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="FracTime" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-sa-alfa" class="label">
+                                <span class="tag is-info">SA</span>
+                                Alfa
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-sa-alfa" min="0.001" step="0.001"
+                                       class="numeric-conf input" data-cat="parametros" data-field="SAlfa" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-sa-temp0" class="label">
+                                <span class="tag is-info">SA</span>
+                                Temperatura inicial
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-sa-temp0" min="0.1" step="0.1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="t0" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-sa-iter" class="label">
+                                <span class="tag is-info">SA</span>
+                                Iterações
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-sa-iter" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="SAiter" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-sa-reaq" class="label">
+                                <span class="tag is-info">SA</span>
+                                Reaquecimentos
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-sa-reaq" min="1"
+                                      class="numeric-conf input" data-cat="parametros" data-field="SAreaq" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-sa-chances-viz" class="label">
+                                <span class="tag is-info">SA</span>
+                                Chances das vizinhanças
+                            </label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="sails-sa-chances-viz" class="numeric-conf" data-cat="parametros" data-field="SAchances">
+                                        <option value="0">25, 43, 20, 10, 2</option>
+                                        <option value="1">35, 43, 10, 5, 7</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-ils-iter" class="label">
+                                <span class="tag is-info">ILS</span>
+                                Iterações
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-ils-iter" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="ILSiter" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-ils-max-pert" class="label">
+                                <span class="tag is-info">ILS</span>
+                                Máximo de perturbações
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-ils-max-pert" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="ILSpmax" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="sails-ils-init-pert" class="label">
+                                <span class="tag is-info">ILS</span>
+                                Inicial de perturbações
+                            </label>
+                            <div class="control">
+                                <input type="number" id="sails-ils-init-pert" min="0"
+                                       class="numeric-conf input" data-cat="parametros" data-field="ILSp0" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-cat="WDJU" hidden class="algo-div">
+                        <div class="field">
+                            <label for="wdju-stagnation" class="label">
+                                <span class="tag is-success">WDJU</span>
+                                Stagnation limit
+                            </label>
+                            <div class="control">
+                                <input type="number" id="wdju-stagnation" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="StagLimit" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="wdju-jump" class="label">
+                                <span class="tag is-success">WDJU</span>
+                                Jump factor
+                            </label>
+                            <div class="control">
+                                <input type="number" id="wdju-jump" min="0.001" step="0.001"
+                                       class="numeric-conf input" data-cat="parametros" data-field="JumpFactor" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                </div>
+
+                <div class="column is-half">
+                    <div data-cat="GRASP" hidden id="grasp-div">
+                        <p class="subtitle is-4">Geração das grades</p>
+
+                        <div class="field">
+                            <label for="grasp-num-iter" class="label">
+                                <span class="tag is-warning">GRASP</span>
+                                Número de iterações sem melhoria
+                            </label>
+                            <div class="control">
+                                <input type="number" id="grasp-num-iter" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="GIter" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="grasp-num-viz" class="label">
+                                <span class="tag is-warning">GRASP</span>
+                                Número de vizinhos
+                            </label>
+                            <div class="control">
+                                <input type="number" id="grasp-num-viz" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="GNViz" />
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="grasp-alfa" class="label">
+                                <span class="tag is-warning">GRASP</span>
+                                Alfa (%)
+                            </label>
+                            <div class="control">
+                                <input type="number" id="grasp-alfa" min="1"
+                                       class="numeric-conf input" data-cat="parametros" data-field="GAlfa" />
+                            </div>
+                        </div>
+                    </div>
+                <div id="pesos-div">
+
+                    <h3 class="subtitle is-4">Pesos</h3>
+
+                    <div class="field">
+                        <label for="pesos-janelas" class="label">Janelas</label>
+                        <div class="control">
+                            <input type="number" id="pesos-janelas" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="Janelas" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-intervalos-trabalho" class="label">Intervalos de Trabalho</label>
+                        <div class="control">
+                            <input type="number" id="pesos-intervalos-trabalho" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="IntervalosTrabalho" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-curriculo-compacto" class="label">Currículo compacto</label>
+                        <div class="control">
+                            <input type="number" id="pesos-curriculo-compacto" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="NumDiasAula" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-sabado" class="label">Aulas aos sábados</label>
+                        <div class="control">
+                            <input type="number" id="pesos-sabado" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="AulasSabado" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-aulas-seguidas" class="label">Aulas seguidas da mesma disciplina</label>
+                        <div class="control">
+                            <input type="number" id="pesos-aulas-seguidas" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="AulasSeguidas" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-aulas-seguidas-dificil" class="label">Aulas seguidas de disciplinas difícieis</label>
+                        <div class="control">
+                            <input type="number" id="pesos-aulas-seguidas-dificil" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="AulasSeguidasDificil" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-aula-dificil-ultimo" class="label">Aula difícil no último horário</label>
+                        <div class="control">
+                            <input type="number" id="pesos-aula-dificil-ultimo" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="AulaDificilUltimoHorario" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-prof-disc" class="label">Preferências dos professores (disciplinas)</label>
+                        <div class="control">
+                            <input type="number" id="pesos-prof-disc" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="PreferenciasProfessores" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="pesos-prof-aulas" class="label">Preferências dos professores (número de aulas)</label>
+                        <div class="control">
+                            <input type="number" id="pesos-prof-aulas" min="0" step="0.001"
+                                   class="numeric-conf input" data-cat="pesos" data-field="AulasProfessores" />
+                        </div>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div id="dados-div">
+                    <h3 class="subtitle is-4">Dados da instituição</h3>
+
+                    <div class="field">
+                        <label for="dias-letivos" class="label">Número de dias letivos por semana</label>
+                        <div class="control">
+                            <input type="number" id="dias-letivos" min="1"
+                                   class="numeric-conf matrix-size input" data-field="numeroDiasLetivos" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="horarios-dia" class="label">Número de horários por dia</label>
+                        <div class="control">
+                            <input type="number" id="horarios-dia" min="1"
+                                   class="numeric-conf matrix-size input" data-field="numeroHorarios" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="numero-alunos" class="label">Número de alunos</label>
+                        <div class="control">
+                            <input type="number" id="numero-alunos" min="1"
+                                   class="numeric-conf input" data-field="numeroAlunos" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="numero-periodos" class="label">Número de turmas/períodos/currículos</label>
+                        <div class="control">
+                            <input type="number" id="numero-periodos" min="1"
+                                   class="numeric-conf input" data-field="numeroPeriodos" />
+                        </div>
+                    </div>
+                </div>
+                </div>
+                </div>
+            </div>
+
+            <div id="solucao">
+            </div>
         </div>
-
-        <div id="tempo-div">
-            <label for="tempo">Tempo (segundos)</label>
-            <input type="number" id="tempo" min="1" class="numeric-conf" data-field="tempo" />
-        </div>
-
-        <div id="fo-div">
-            <label for="fo-select">Função objetivo</label>
-            <select id="fo-select">
-                <option value="pref">Preferências</option>
-                <option value="grade">Grade</option>
-            </select>
-        </div>
-
-        <div id="param-div">
-            <h3>Parâmetros dos algoritmos</h3>
-
-            <div data-cat="AG" class="algo-div">
-                <div>
-                    <label for="ag-num-indiv">[AG] Número de indivíduos</label>
-                    <input type="number" id="ag-num-indiv" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="NIndiv" />
-                </div>
-
-                <div>
-                    <label for="ag-num-iter">[AG] Número de iterações sem melhoria</label>
-                    <input type="number" id="ag-num-iter" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="AGIter" />
-                </div>
-
-                <div>
-                    <label for="ag-porc-cruz">[AG] Porcentagem de cruzamentos</label>
-                    <input type="number" id="ag-porc-cruz" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="%Cruz" />
-                </div>
-
-                <div>
-                    <label for="ag-taxa-mut">[AG] Taxa de mutação</label>
-                    <input type="number" id="ag-taxa-mut" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="TaxaMut" />
-                </div>
-
-                <div>
-                    <label for="ag-cruz-op">[AG] Operador de cruzamento</label>
-                    <select id="ag-cruz-op" data-cat="parametros" data-field="CruzOper">
-                        <option value="CX">Cycle Crossover</option>
-                        <option value="OX">Order Crossover</option>
-                        <option value="PMX">Partially Mapped Crossover</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="ag-tent-mut">[AG] Tentativas de mutação</label>
-                    <input type="number" id="ag-tent-mut" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="NMut" />
-                </div>
-
-                <div>
-                    <label for="ag-tam-torneio">[AG] Tamanho do torneio</label>
-                    <input type="number" id="ag-tam-torneio" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="NTour" />
-                </div>
-            </div>
-
-            <div data-cat="HySST" hidden class="algo-div">
-                <div>
-                    <label for="hysst-max-level">[HySST] Max level</label>
-                    <input type="number" id="hysst-max-level" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="MaxLevel" />
-                </div>
-
-                <div>
-                    <label for="hysst-thres-start">[HySST] Threshold start</label>
-                    <input type="number" id="hysst-thres-start" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="TStart" />
-                </div>
-
-                <div>
-                    <label for="hysst-thres-step">[HySST] Threshold step</label>
-                    <input type="number" id="hysst-thres-step" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="TStep" />
-                </div>
-
-                <div>
-                    <label for="hysst-iter-hc">[HySST] Iterações hill climbing</label>
-                    <input type="number" id="hysst-iter-hc" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="IterHc" />
-                </div>
-
-                <div>
-                    <label for="hysst-iter-neigh">[HySST] Iterações vizinhança</label>
-                    <input type="number" id="hysst-iter-neigh" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="IterMut" />
-                </div>
-            </div>
-
-            <div data-cat="SA-ILS" hidden class="algo-div">
-                <div>
-                    <label for="sails-timeout">[SA/ILS] Timeout por execução (fração do total)</label>
-                    <input type="number" id="sails-timeout" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="FracTime" />
-                </div>
-
-                <div>
-                    <label for="sails-sa-alfa">[SA] Alfa</label>
-                    <input type="number" id="sails-sa-alfa" min="0.001" step="0.001" class="numeric-conf"
-                           data-cat="parametros" data-field="SAlfa" />
-                </div>
-
-                <div>
-                    <label for="sails-sa-temp0">[SA] Temperatura inicial</label>
-                    <input type="number" id="sails-sa-temp0" min="0.1" step="0.1" class="numeric-conf"
-                           data-cat="parametros" data-field="t0" />
-                </div>
-
-                <div>
-                    <label for="sails-sa-iter">[SA] Iterações</label>
-                    <input type="number" id="sails-sa-iter" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="SAiter" />
-                </div>
-
-                <div>
-                    <label for="sails-sa-reaq">[SA] Reaquecimentos</label>
-                    <input type="number" id="sails-sa-reaq" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="SAreaq" />
-                </div>
-
-                <div>
-                    <label for="sails-sa-chances-viz">[SA] Chances das vizinhanças</label>
-                    <select id="sails-sa-chances-viz" class="numeric-conf"
-                            data-cat="parametros" data-field="SAchances">
-                        <option value="0">25, 43, 20, 10, 2</option>
-                        <option value="1">35, 43, 10, 5, 7</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="sails-ils-iter">[ILS] Iterações</label>
-                    <input type="number" id="sails-ils-iter" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="ILSiter" />
-                </div>
-
-                <div>
-                    <label for="sails-ils-max-pert">[ILS] Máximo de perturbações</label>
-                    <input type="number" id="sails-ils-max-pert" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="ILSpmax" />
-                </div>
-
-                <div>
-                    <label for="sails-ils-init-pert">[ILS] Inicial de perturbações</label>
-                    <input type="number" id="sails-ils-init-pert" min="0" class="numeric-conf"
-                           data-cat="parametros" data-field="ILSp0" />
-                </div>
-            </div>
-
-            <div data-cat="WDJU" hidden class="algo-div">
-                <div>
-                    <label for="wdju-stagnation">[WDJU] Stagnation limit</label>
-                    <input type="number" id="wdju-stagnation" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="StagLimit" />
-                </div>
-
-                <div>
-                    <label for="wdju-jump">[WDJU] Jump factor</label>
-                    <input type="number" id="wdju-jump" min="0.001" step="0.001" class="numeric-conf"
-                           data-cat="parametros" data-field="JumpFactor" />
-                </div>
-            </div>
-
-            <div data-cat="GRASP" hidden id="grasp-div">
-                <div>
-                    <label for="grasp-num-iter">[GRASP] Número de iterações sem melhoria</label>
-                    <input type="number" id="grasp-num-iter" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="GIter" />
-                </div>
-
-                <div>
-                    <label for="grasp-num-viz">[GRASP] Número de vizinhos</label>
-                    <input type="number" id="grasp-num-viz" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="GNViz" />
-                </div>
-
-                <div>
-                    <label for="grasp-alfa">[GRASP] Alfa (%)</label>
-                    <input type="number" id="grasp-alfa" min="1" class="numeric-conf"
-                           data-cat="parametros" data-field="GAlfa" />
-                </div>
-            </div>
-        </div>
-
-        <div id="pesos-div">
-            <h3>Pesos</h3>
-
-            <div>
-                <label for="pesos-janelas">Janelas</label>
-                <input type="number" id="pesos-janelas" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="Janelas"/>
-            </div>
-
-            <div>
-                <label for="pesos-intervalos-trabalho">Intervalos de Trabalho</label>
-                <input type="number" id="pesos-intervalos-trabalho" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="IntervalosTrabalho" />
-            </div>
-
-            <div>
-                <label for="pesos-curriculo-compacto">Currículo compacto</label>
-                <input type="number" id="pesos-curriculo-compacto" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="NumDiasAula" />
-            </div>
-
-            <div>
-                <label for="pesos-sabado">Aulas aos sábados</label>
-                <input type="number" id="pesos-sabado" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="AulasSabado" />
-            </div>
-
-            <div>
-                <label for="pesos-aulas-seguidas">Aulas seguidas da mesma disciplina</label>
-                <input type="number" id="pesos-aulas-seguidas" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="AulasSeguidas" />
-            </div>
-
-            <div>
-                <label for="pesos-aulas-seguidas-dificil">Aulas seguidas de disciplinas difícieis</label>
-                <input type="number" id="pesos-aulas-seguidas-dificil" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="AulasSeguidasDificil" />
-            </div>
-
-            <div>
-                <label for="pesos-aula-dificil-ultimo">Aula difícil no último horário</label>
-                <input type="number" id="pesos-aula-dificil-ultimo" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="AulaDificilUltimoHorario" />
-            </div>
-
-            <div>
-                <label for="pesos-prof-disc">Preferências dos professores (disciplinas)</label>
-                <input type="number" id="pesos-prof-disc" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="PreferenciasProfessores" />
-            </div>
-
-            <div>
-                <label for="pesos-prof-aulas">Preferências dos professores (número de aulas)</label>
-                <input type="number" id="pesos-prof-aulas" min="0" step="0.001" class="numeric-conf"
-                       data-cat="pesos" data-field="AulasProfessores" />
-            </div>
-        </div>
-
-        <div id="dados-div">
-            <h3>Dados da instituição</h3>
-
-            <div>
-                <label for="dias-letivos">Número de dias letivos por semana</label>
-                <input type="number" id="dias-letivos" min="1" class="numeric-conf matrix-size"
-                       data-field="numeroDiasLetivos" />
-            </div>
-
-            <div>
-                <label for="horarios-dia">Número de horários por dia</label>
-                <input type="number" id="horarios-dia" min="1" class="numeric-conf matrix-size"
-                       data-field="numeroHorarios" />
-            </div>
-
-            <div>
-                <label for="numero-alunos">Número de alunos</label>
-                <input type="number" id="numero-alunos" min="1" class="numeric-conf" data-field="numeroAlunos" />
-            </div>
-
-            <div>
-                <label for="numero-periodos">Número de turmas/períodos/currículos</label>
-                <input type="number" id="numero-periodos" min="1" class="numeric-conf" data-field="numeroPeriodos" />
-            </div>
-        </div>
-    </div>
-
-    <div id="solucao">
-    </div>
+    </section>
 </body>
 
 </html>

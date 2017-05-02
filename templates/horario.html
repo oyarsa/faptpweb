@@ -3,10 +3,11 @@
     <meta charset="utf-8" />
     <title>Horários</title>
     <style>{{ css }}</style>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='estilo.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='horario.css') }}" />
 </head>
 
 <body>
+    <a href="/">Voltar</a>
     {% for nome, horarios in periodos %}
         <h1 align="center" class="nome">{{ nome }}</h1>
         <table align="center" class="horario">
@@ -36,5 +37,6 @@
             </tbody>
         </table>
     {% endfor %}
+    <a href="/">Voltar</a>
 </body>
 </html>

@@ -95,7 +95,7 @@ let config = {
  *                     juntamente com eles para de fato executar a função.
  */
 function curry(fn, ...args1) {
-    return (...args2) => fn(...args1, ...args2);
+    return (...args2) => fn(...args1, ...args2)
 }
 
 /**
@@ -129,7 +129,7 @@ function handle_numeric_config(evt) {
     const categoria = input.getAttribute('data-cat')
     const obj = categoria ? config[categoria] : config
     const campo = input.getAttribute('data-field')
-    obj[campo] = Number.parseFloat(input.value)
+    obj[campo] = parseFloat(input.value)
 }
 
 /**
@@ -182,7 +182,7 @@ function handle_fo(evt) {
  */
 function registra_horas(prof, evt) {
     console.log('horas')
-    prof.preferenciasHoras = Number.parseInt(evt.target.value, 10)
+    prof.preferenciasHoras = parseInt(evt.target.value, 10)
 }
 
 /**
@@ -237,6 +237,9 @@ function matriz(n, m, value) {
 /**
  * Modifica a disponibilidade do professor no dia e horário associados
  * ao input modificado.
+ * @param {object} prof Um professor.
+ * @param {number} horario Número do horário (0-indexed).
+ * @param {number} dia Número do dia (0-indexed).
  * @param {Event} evt Evento ativado quando o controle é modificado.
  */
 function registra_disponibilidade(prof, horario, dia, evt) {
@@ -254,6 +257,7 @@ function render_matriz(cell, prof) {
         prof.disponibilidade = matriz(config.numeroHorarios, config.numeroDiasLetivos, true)
 
     const table = document.createElement('table')
+    table.className = 'table is-narrow'
     cell.appendChild(table)
 
     const header = document.createElement('thead')
@@ -304,24 +308,36 @@ function render_professor(prof) {
     const linha = table.insertRow(table.rows.length)
 
     const id = linha.insertCell(0)
-    id.appendChild(document.createTextNode(prof.id))
+    const id_txt = document.createElement('em')
+    id.appendChild(id_txt)
+    id_txt.textContent = prof.id
 
     const nome = linha.insertCell(1)
-    nome.appendChild(document.createTextNode(prof.nome))
+    const nome_txt = document.createElement('strong')
+    nome.appendChild(nome_txt)
+    nome_txt.textContent = prof.nome
 
     const horas = linha.insertCell(2)
+    const in_wrapper = document.createElement('span')
+    horas.appendChild(in_wrapper)
+    in_wrapper.className = 'control'
     const input_horas = document.createElement('input')
-    horas.appendChild(input_horas)
+    in_wrapper.appendChild(input_horas)
 
     input_horas.placeholder = 'Horas'
-    input_horas.min = 0
+    input_horas.min = '0'
+    input_horas.className = 'input'
     input_horas.addEventListener('change', curry(registra_horas, prof), false)
 
     const disciplinas = linha.insertCell(3)
+    const text_wrapper = document.createElement('span')
+    disciplinas.appendChild(text_wrapper)
+    text_wrapper.className = 'control'
     const text_discs = document.createElement('textarea')
-    disciplinas.appendChild(text_discs)
+    text_wrapper.appendChild(text_discs)
 
-    text_discs.placeholder = 'Disciplinas'
+    text_discs.className = 'textarea'
+    text_discs.placeholder = 'Disciplinas, uma por linha'
     text_discs.addEventListener('change', curry(registra_discs, prof), false)
 
     render_matriz(linha.insertCell(4), prof)
@@ -346,10 +362,14 @@ function render_disciplina(disc) {
     const linha = table.insertRow(table.rows.length)
 
     const id = linha.insertCell(0)
-    id.appendChild(document.createTextNode(disc.id))
+    const id_txt = document.createElement('em')
+    id.appendChild(id_txt)
+    id_txt.textContent = disc.id
 
     const nome = linha.insertCell(1)
-    nome.appendChild(document.createTextNode(disc.nome))
+    const nome_txt = document.createElement('strong')
+    nome.appendChild(nome_txt)
+    nome_txt.textContent = disc.nome
 
     const periodo = linha.insertCell(2)
     periodo.appendChild(document.createTextNode(disc.periodo))
@@ -484,6 +504,25 @@ function set_param_value(element) {
     element.value = value
 }
 
+function setup_tab(evt) {
+    const tab = evt.target.parentNode.getAttribute('data-name')
+
+    Array.from(evt.target.parentNode.parentNode.children).forEach((e) => {
+        if (e.getAttribute('data-name') == tab)
+            e.classList.add('is-active')
+        else
+            e.classList.remove('is-active')
+    })
+
+    if (tab == 'professores') {
+        document.getElementById('disciplinas').setAttribute('hidden', true)
+        document.getElementById('professores').removeAttribute('hidden')
+    } else if (tab == 'disciplinas') {
+        document.getElementById('professores').setAttribute('hidden', true)
+        document.getElementById('disciplinas').removeAttribute('hidden')
+    }
+}
+
 /**
  * Registra os eventos de mudança para o controle de upload da entrada e
  * envio para o servidor.
@@ -501,6 +540,10 @@ window.onload = function() {
     document.getElementById('fo-select').addEventListener('change', handle_fo, false)
 
     // Coloca todos os inputs em seus defaults, para evitar problemas com eventos
-    document.querySelectorAll('select').forEach(e => e.selectedIndex = 0)
     document.querySelectorAll('.numeric-conf').forEach(set_param_value)
+    document.querySelectorAll('select').forEach(e => e.selectedIndex = 0)
+
+    // Abas
+    document.querySelectorAll('.tab-link')
+        .forEach(e => e.addEventListener('click', setup_tab, false))
 }
