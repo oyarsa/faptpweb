@@ -1,6 +1,5 @@
 import os
 import random
-import pprint
 import json
 import sys
 import sqlite3
@@ -184,6 +183,7 @@ def executar_solver(dados):
     args = [FAPTP, '-i', INPUT_FILE, '-o', OUTPUT_FILE, '-c', CONFIG_FILE]
 
     try:
+        print('Executando')
         processo = run(args, universal_newlines=True)
     except CalledProcessError as e:
         print('Erro ao executar o processo, código: {}, mensagem: {}'
@@ -193,8 +193,9 @@ def executar_solver(dados):
         print('Executável do faptp não encontrado: {}'.format(e.strerror))
         raise
     finally:
-        os.remove(INPUT_FILE)
-        os.remove(CONFIG_FILE)
+        pass
+        # os.remove(INPUT_FILE)
+        # os.remove(CONFIG_FILE)
 
     with open(OUTPUT_FILE, 'r', encoding='utf-8') as f:
         saida = f.read()
@@ -237,7 +238,6 @@ def gerar_horario():
     recuperar os dados de entrada e configuração, além da saída.
     """
     dados = request.json
-    pprint.pprint(dados)
 
     try:
         saida, pk = executar_solver(dados)

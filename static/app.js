@@ -382,7 +382,7 @@ function render_disciplina(disc, habilitados) {
     text_wrapper.appendChild(prof_ta)
 
     prof_ta.className = 'textarea habilitados'
-    prof_ta.textContent = habilitados.join("\n")
+    prof_ta.textContent = habilitados ? habilitados.join("\n") : ''
     prof_ta.placeholder = "Professores habilitados, um por linha"
     prof_ta.addEventListener('change', registra_habilitado, false)
     prof_ta.setAttribute('data-disc', disc.id)
@@ -457,16 +457,27 @@ function enviar_json() {
     const xhr = new XMLHttpRequest()
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            const res = JSON.parse(xhr.responseText)
-            if (xhr.status === 200)
+            if (xhr.status === 200) {
                 disponibilizar_solucao(res)
-            else
+                const res = JSON.parse(xhr.responseText)
+            } else {
                 alert('Erro no servidor: ' + res.message)
+            }
+
+            document.getElementById('notificacao').classList.remove('is-active')
         }
     }
     xhr.open('POST', '/gerar_horario', true)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.send(JSON.stringify(json))
+
+    document.getElementById('notificacao').classList.add('is-active')
+
+    document.getElementById('cancelar-req').addEventListener('click', () => {
+        console.log('oi')
+        xhr.abort()
+        document.getElementById('notificacao').classList.remove('is-active')
+    })
 }
 
 /**
@@ -480,37 +491,42 @@ function disponibilizar_solucao(res) {
     const saida = JSON.parse(res.saida)
     const solucao = document.getElementById('solucao')
     solucao.innerHTML = ""
+    solucao.classList.add("box")
+
+    const titulo = document.createElement('p')
+    solucao.appendChild(titulo)
+    titulo.textContent = 'Resultado'
+    titulo.classList.add('title', 'is-2', 'is-spaced')
 
     const texto = document.createElement('h2')
     solucao.appendChild(texto)
-    texto.textContent = `Seu código: ${res.id}`
+    texto.textContent = `Código da execução: ${res.id}`
+    texto.classList.add('subtitle', 'is-5')
 
     const fo_grade = document.createElement('p')
-    texto.appendChild(fo_grade)
+    solucao.appendChild(fo_grade)
     fo_grade.textContent = `FO (grades): ${saida.fo_grade}h`
+    fo_grade.classList.add('subtitle', 'is-5')
 
     const fo_pref = document.createElement('p')
-    texto.appendChild(fo_pref)
+    solucao.appendChild(fo_pref)
     fo_pref.textContent = `FO (preferências): ${saida.fo_preferencias}`
-
-    texto.appendChild(document.createElement('br'))
+    fo_pref.classList.add('subtitle', 'is-5')
 
     const url = document.createElement('a')
-    texto.appendChild(url)
+    solucao.appendChild(url)
     url.href = window.URL.createObjectURL(new Blob([res.saida], {
         type: 'text/json'
     }))
     url.download = 'saida.json'
-    url.textContent = 'Resultado'
+    url.textContent = 'Download (JSON)'
 
-    texto.appendChild(document.createElement('br'))
+    solucao.appendChild(document.createElement('br'))
 
     const html = document.createElement('a')
-    texto.appendChild(html)
+    solucao.appendChild(html)
     html.href = `/horario/${res.id}`
     html.textContent = 'Visualizar horário'
-
-    window.location.href = '#solucao'
 }
 
 /**
@@ -572,6 +588,28 @@ function mapeamento_habilitacoes_entrada() {
             disc_prof.get(d).push(p.id)
         })
     })
+
+    for (let k of disc_prof.keys()) {
+        disc_prof.set(k, [...new Set(disc_prof.get(k))])
+    }
+
+    entrada.disciplinas.forEach((d) => {
+        if (!disc_prof.has(d.id))
+            d.ofertada = false
+    })
+
+    entrada.disciplinas.sort((a, b) => {
+        if (a.ofertada != b.ofertada)
+            return b.ofertada - a.ofertada
+
+        if (a.curso != b.curso)
+            return a.curso.localeCompare(b.curso)
+
+        const a_periodo = parseInt(a.periodo.split('-')[0])
+        const b_periodo = parseInt(b.periodo.split('-')[0])
+        return a_periodo - b_periodo
+    } )
+
     return disc_prof
 }
 
@@ -582,6 +620,15 @@ function mapeamento_habilitacoes_entrada() {
  */
 function find_prof_by_id(prof_id) {
     return entrada.professores.find(p => p.id == prof_id)
+}
+
+/**
+ * Obtém o objeto da disciplina a partir de seu ID.
+ * @param {string} disc_id Identificação da disciplina.
+ * @returns {object} Objeto da disciplina obtida.
+ */
+function find_disc_by_id(disc_id) {
+    return entrada.disciplinas.find(d => d.id == disc_id)
 }
 
 /**

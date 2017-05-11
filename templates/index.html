@@ -9,6 +9,16 @@
 </head>
 
 <body>
+    <div class="modal" id="notificacao">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="box has-text-centered">
+                <p class="subtitle is-5">Requisição enviada. Aguarde.</p>
+                <button class="button is-primary" id="cancelar-req">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <section class="section">
         <div class="container">
             <p class="title is-2">Gerar horário <a href="/pesquisar">Pesquisar horário</a></p>
@@ -19,6 +29,9 @@
 
                 <input type="file" accept=".json" id="entrada-upload" />
                 <button id="gerar-btn" class="button is-primary">Gerar horário</button>
+            </div>
+
+            <div id="solucao" class="has-text-centered">
             </div>
 
             <div class="tabs is-fullwidth is-medium">
@@ -531,11 +544,10 @@
                 </div>
                 </div>
             </div>
-
-            <div id="solucao">
-            </div>
         </div>
     </section>
+
+    </body>
 </body>
 
 </html>
