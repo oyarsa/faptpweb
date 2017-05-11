@@ -4,7 +4,7 @@ import pprint
 import json
 import sys
 import sqlite3
-from subprocess import PIPE, run, STDOUT, CalledProcessError
+from subprocess import run, CalledProcessError
 from flask import Flask, request, render_template, jsonify
 
 # Caminho para o executável do solver
@@ -78,6 +78,35 @@ def carregar_periodos(horarios, num_horarios, num_dias):
             return nome
 
     return sorted(periodos, key=sort_func)
+
+
+def carregar_alunos(horarios, num_horarios, num_dias):
+    alunos = []
+
+    for aluno in horarios['alunos']:
+        desc = aluno['descricao']
+        matriz = matriz_vazia(num_horarios, num_dias)
+        fo = round(aluno["fo"])
+
+        for e in aluno['grade']:
+            dia = int(e['dia'])
+            horario = int(e['horario'])
+            matriz[horario][dia] = {
+                'disc': e['disciplina'],
+            }
+
+        alunos.append((desc, matriz, fo))
+
+    def sort_func(tup):
+        nome, _, _ = tup
+        try:
+            id_, periodo = nome.split('-')
+            curso, turma = periodo.split('-')
+            return curso, turma, id_
+        except ValueError:
+            return nome
+
+    return sorted(alunos, key=sort_func)
 
 
 def init_db():
@@ -156,7 +185,6 @@ def executar_solver(dados):
 
     try:
         processo = run(args, universal_newlines=True)
-        processo.check_returncode()
     except CalledProcessError as e:
         print('Erro ao executar o processo, código: {}, mensagem: {}'
               .format(e.returncode, e.stderr))
@@ -252,7 +280,14 @@ def horario(key):
         num_horarios = int(config['numeroHorarios'])
         num_dias = int(config['numeroDiasLetivos'])
         periodos = carregar_periodos(solucao, num_horarios, num_dias)
-        return render_template('horario.html', periodos=periodos, dias=dias)
+        alunos = carregar_alunos(solucao, num_horarios, num_dias)
+        return render_template(
+            'horario.html',
+            periodos=periodos,
+            dias=dias,
+            alunos=alunos,
+            fo_grade=solucao['fo_grade'],
+            fo_pref=solucao['fo_preferencias'])
 
 
 if __name__ == '__main__':

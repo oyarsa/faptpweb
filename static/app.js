@@ -11,7 +11,7 @@ let entrada = null
  * Objeto com os parâmetros de configuração para o solver. Será modificado
  * partir dos controles da interface, tendo uma valor default inicial.
  * @property {string} algoritmo Nome do algoritmo a ser utiliado.
-*    Valores possíveis: <tt>AG, HySST, SA-ILS, WDJU</tt>
+ *    Valores possíveis: <tt>AG, HySST, SA-ILS, WDJU</tt>
  * @property {number} tempo Tempo de execução máximo, em segundos.
  * @property {object} parametros Parâmetros de configuração do algoritmo.
  *     Valores possíveis:
@@ -89,7 +89,7 @@ let config = {
  * const multBy2 = curry(mult, 2)
  * multBy2(10) === 20
  *
- * @param {function} fn Função a ser parcialmente aplicada.
+ * @param {cunction} fn Função a ser parcialmente aplicada.
  * @param {...*} args1 Os primeiros argumentos de fn
  * @returns {function} Uma função que recebe os argumentos restantes, aplicando args1
  *                     juntamente com eles para de fato executar a função.
@@ -357,24 +357,37 @@ function render_preferencias_professor() {
  * sua ID, seu nome e um checkbox para indicar se ela é uma disciplina difícil.
  * @param {object} disc Disciplina a ser representada na tabela.
  */
-function render_disciplina(disc) {
+function render_disciplina(disc, habilitados) {
     const table = document.getElementById('disciplinas').getElementsByTagName('tbody')[0]
     const linha = table.insertRow(table.rows.length)
 
-    const id = linha.insertCell(0)
+    const id = linha.insertCell()
     const id_txt = document.createElement('em')
     id.appendChild(id_txt)
     id_txt.textContent = disc.id
 
-    const nome = linha.insertCell(1)
+    const nome = linha.insertCell()
     const nome_txt = document.createElement('strong')
     nome.appendChild(nome_txt)
     nome_txt.textContent = disc.nome
 
-    const periodo = linha.insertCell(2)
+    const periodo = linha.insertCell()
     periodo.appendChild(document.createTextNode(disc.periodo))
 
-    const dificil = linha.insertCell(3)
+    const professores = linha.insertCell()
+    const text_wrapper = document.createElement('span')
+    professores.appendChild(text_wrapper)
+    text_wrapper.className = 'control'
+    const prof_ta = document.createElement('textarea')
+    text_wrapper.appendChild(prof_ta)
+
+    prof_ta.className = 'textarea habilitados'
+    prof_ta.textContent = habilitados.join("\n")
+    prof_ta.placeholder = "Professores habilitados, um por linha"
+    prof_ta.addEventListener('change', registra_habilitado, false)
+    prof_ta.setAttribute('data-disc', disc.id)
+
+    const dificil = linha.insertCell()
     const dificil_input = document.createElement('input')
     dificil.appendChild(dificil_input)
 
@@ -382,7 +395,7 @@ function render_disciplina(disc) {
     dificil_input.checked = !!disc.dificil
     dificil_input.addEventListener('change', curry(registra_dificil, disc), false)
 
-    const ofertada = linha.insertCell(4)
+    const ofertada = linha.insertCell()
     const ofertada_input = document.createElement('input')
     ofertada.appendChild(ofertada_input)
 
@@ -397,7 +410,8 @@ function render_disciplina(disc) {
  */
 function render_disciplinas_dificeis() {
     document.getElementById('disciplinas').getElementsByTagName('tbody')[0].innerHTML = ""
-    entrada.disciplinas.forEach(render_disciplina)
+    const professores = mapeamento_habilitacoes_entrada()
+    entrada.disciplinas.forEach(d => render_disciplina(d, professores.get(d.id)))
 }
 
 /**
@@ -406,7 +420,7 @@ function render_disciplinas_dificeis() {
  * @returns {number}  Número de períodos/turmas/currículos.
  */
 function calcular_numero_periodos() {
-     return new Set(entrada.disciplinas.filter(d => d.ofertada).map(d => d.periodo)).size
+    return new Set(entrada.disciplinas.filter(d => d.ofertada).map(d => d.periodo)).size
 }
 
 /**
@@ -463,6 +477,7 @@ function enviar_json() {
  * @param {object} res.saida JSON com a solução.
  */
 function disponibilizar_solucao(res) {
+    const saida = JSON.parse(res.saida)
     const solucao = document.getElementById('solucao')
     solucao.innerHTML = ""
 
@@ -470,11 +485,21 @@ function disponibilizar_solucao(res) {
     solucao.appendChild(texto)
     texto.textContent = `Seu código: ${res.id}`
 
+    const fo_grade = document.createElement('p')
+    texto.appendChild(fo_grade)
+    fo_grade.textContent = `FO (grades): ${saida.fo_grade}h`
+
+    const fo_pref = document.createElement('p')
+    texto.appendChild(fo_pref)
+    fo_pref.textContent = `FO (preferências): ${saida.fo_preferencias}`
+
     texto.appendChild(document.createElement('br'))
 
     const url = document.createElement('a')
     texto.appendChild(url)
-    url.href = window.URL.createObjectURL(new Blob([res.saida], { type: 'text/json' }))
+    url.href = window.URL.createObjectURL(new Blob([res.saida], {
+        type: 'text/json'
+    }))
     url.download = 'saida.json'
     url.textContent = 'Resultado'
 
@@ -489,8 +514,8 @@ function disponibilizar_solucao(res) {
 }
 
 /**
- * Configura o valor do elemento para corresponder àquele em {@link config}.
- * O Elemento precisa ter o atributo <tt>data-field</tt>, que irá corresponder à
+ * Configura o valor do elemento para corresponder àquele em {@link O}.
+ * config Elemento precisa ter o atributo <tt>data-field</tt>, que irá corresponder à
  * propriedade em <tt>config</tt>. O atributo <tt>data-cat</tt> é opcional, e se existir
  * diz respeito ao objeto interno em <tt>config</tt>.
  * @param {Element} element Elemento a ser configurado.
@@ -504,6 +529,11 @@ function set_param_value(element) {
     element.value = value
 }
 
+/**
+ * Configura comportamento das abas, mostrando o conteúdo relativo à aba ativa
+ * e escondendo o resto.
+ * @param {Event} evt Evento disparado quando a aba é clicada.
+ */
 function setup_tab(evt) {
     const tab = evt.target.parentNode.getAttribute('data-name')
 
@@ -521,6 +551,72 @@ function setup_tab(evt) {
         document.getElementById('professores').setAttribute('hidden', true)
         document.getElementById('disciplinas').removeAttribute('hidden')
     }
+}
+
+/**
+ * Constrói um Map com o mapemento disciplina -> professores habilitados,
+ * construído a partir dos dados de entrada.
+ * É importante porque nos dados o relacionamento está do lado do professor
+ * (i.e., o professor contém uma lista das disciplinas que pode lecionar),
+ * mas na interface é necessário o contrário.
+ * @returns {Map} Mapeamento disciplinas -> professores habilitados.
+ */
+function mapeamento_habilitacoes_entrada() {
+    if (!entrada) return null
+
+    const disc_prof = new Map()
+    entrada.professores.forEach((p) => {
+        p.competencias.forEach((d) => {
+            if (!disc_prof.has(d))
+                disc_prof.set(d, [])
+            disc_prof.get(d).push(p.id)
+        })
+    })
+    return disc_prof
+}
+
+/**
+ * Obtém o objeto do professor a partir de seu ID.
+ * @param {string} prof_id Identificação do professor.
+ * @returns {object} Objeto do professor obtido.
+ */
+function find_prof_by_id(prof_id) {
+    return entrada.professores.find(p => p.id == prof_id)
+}
+
+/**
+ * Constrói um mapeamento professor -> disciplinas que pode lecionar, a partir do
+ * conteúdo dos textareas.
+ * É importante porque nos dados o relacionamento está do lado do professor
+ * (i.e., o professor contém uma lista das disciplinas que pode lecionar), mas
+ * na interface é necessário o contrário.
+ * @returns {Map} Mapeamento professor -> disciplinas que pode lecionar
+ */
+function mapeamento_habilitacoes_text() {
+    const texts = document.querySelectorAll('.habilitados')
+    const map = new Map()
+
+    texts.forEach((t) => {
+        const disc = t.getAttribute('data-disc')
+        t.value.split('\n').map(s => s.trim()).forEach((p) => {
+            if (!map.has(p))
+                map.set(p, [])
+            map.get(p).push(disc)
+        })
+    })
+
+    return map
+}
+
+/**
+ * Callback chamado quando um textarea de professor-disciplina é modificado.
+ * @param {Evento} evt Disparado quando um textarea de professor-disciplina é disparado.
+ */
+function registra_habilitado(evt) {
+    console.log('habilitados')
+
+    const prof_disc = mapeamento_habilitacoes_text()
+    entrada.professores.forEach(p => p.competencias = prof_disc.get(p.id))
 }
 
 /**

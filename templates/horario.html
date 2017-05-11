@@ -8,8 +8,16 @@
 
 <body>
     <a href="/">Voltar</a>
+
+    <h3 align="center">FO (grades): {{ fo_grade }}</h3>
+    <h3 align="center">FO (preferências): {{ fo_pref }}</h3>
+
+    <hr/>
+
+    <h1 align="center" class="nome">Períodos</h1>
+
     {% for nome, horarios in periodos %}
-        <h1 align="center" class="nome">{{ nome }}</h1>
+        <h2 align="center" class="nome">{{ nome }}</h2>
         <table align="center" class="horario">
             <thead>
                 <tr>
@@ -29,6 +37,37 @@
                                     <b>{{ evento.disc }}</b>
                                     <br/>
                                     <i>{{ evento.prof }}</i>
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+
+    <hr/>
+    <h1 class="nome" align="center">Alunos</h1>
+
+    {% for id, grade, fo in alunos %}
+        <h2 align="center" class="nome">{{ id }} ({{ fo }}h)</h2>
+        <table align="center" class="horario">
+            <thead>
+                <tr>
+                    {% for dia in dias %}
+                        <th>{{ dia }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for horario in grade %}
+                    <tr>
+                        {% for evento in horario %}
+                            {% if evento is none %}
+                                <td>---</td>
+                            {% else %}
+                                <td>
+                                    <b>{{ evento.disc }}</b>
                                 </td>
                             {% endif %}
                         {% endfor %}
