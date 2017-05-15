@@ -420,7 +420,7 @@ function render_disciplinas_dificeis() {
  * @returns {number}  Número de períodos/turmas/currículos.
  */
 function calcular_numero_periodos() {
-    return new Set(entrada.disciplinas.filter(d => d.ofertada).map(d => d.periodo)).size
+    return new Set(entrada.disciplinas.filter(d => d.ofertada).map(d => `${d.curso}-${d.periodo}-${d.turma}`)).size
 }
 
 /**
@@ -432,6 +432,8 @@ function load_file() {
     document.getElementById('numero-alunos').value = config.numeroAlunos
     config.numeroPeriodos = calcular_numero_periodos()
     document.getElementById('numero-periodos').value = config.numeroPeriodos
+
+    document.getElementById('solucao').innerHTML = ''
 
     render_preferencias_professor()
     render_disciplinas_dificeis()
@@ -457,11 +459,11 @@ function enviar_json() {
     const xhr = new XMLHttpRequest()
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
+            const res = JSON.parse(xhr.responseText)
             if (xhr.status === 200) {
                 disponibilizar_solucao(res)
-                const res = JSON.parse(xhr.responseText)
             } else {
-                alert('Erro no servidor: ' + res.message)
+                alert('Erro interno do servidor: ' + res.message)
             }
 
             document.getElementById('notificacao').classList.remove('is-active')
@@ -474,7 +476,7 @@ function enviar_json() {
     document.getElementById('notificacao').classList.add('is-active')
 
     document.getElementById('cancelar-req').addEventListener('click', () => {
-        console.log('oi')
+        xhr.onreadystatechange = null
         xhr.abort()
         document.getElementById('notificacao').classList.remove('is-active')
     })
@@ -596,6 +598,7 @@ function mapeamento_habilitacoes_entrada() {
     entrada.disciplinas.forEach((d) => {
         if (!disc_prof.has(d.id))
             d.ofertada = false
+        d.periodo = String(d.periodo)
     })
 
     entrada.disciplinas.sort((a, b) => {
@@ -608,7 +611,7 @@ function mapeamento_habilitacoes_entrada() {
         const a_periodo = parseInt(a.periodo.split('-')[0])
         const b_periodo = parseInt(b.periodo.split('-')[0])
         return a_periodo - b_periodo
-    } )
+    })
 
     return disc_prof
 }

@@ -99,10 +99,12 @@ def carregar_alunos(horarios, num_horarios, num_dias):
     def sort_func(tup):
         nome, _, _ = tup
         try:
-            id_, periodo = nome.split('-')
-            curso, turma = periodo.split('-')
+            id_, periodo = nome.split(' - ')
+            turma, curso = periodo.split('-')
+            print(f'id: {id_}, turma: {turma}, curso: {curso}')
             return curso, turma, id_
         except ValueError:
+            print(f'ops, {nome}')
             return nome
 
     return sorted(alunos, key=sort_func)
@@ -241,6 +243,7 @@ def gerar_horario():
 
     try:
         saida, pk = executar_solver(dados)
+        print('Terminou')
         return jsonify(saida=saida, id=pk)
     except Exception as e:
         print('Exceção: ', e)
