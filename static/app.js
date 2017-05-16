@@ -247,6 +247,11 @@ function registra_disponibilidade(prof, horario, dia, evt) {
     prof.disponibilidade[horario][dia] = evt.target.checked
 }
 
+function registra_num_turmas(disc, evt) {
+    console.log('num turmas')
+    disc.numTurmas = evt.target.value
+}
+
 /**
  * Desenha a matriz de disponibilidades do professor <tt>prof</tt> no elemento <tt>cell</tt>.
  * @param {Node} cell Elemento onde a matriz será desenhada.
@@ -373,6 +378,16 @@ function render_disciplina(disc, habilitados) {
 
     const periodo = linha.insertCell()
     periodo.appendChild(document.createTextNode(disc.periodo))
+
+    const turmas = linha.insertCell()
+    const input_wrapper = document.createElement('span')
+    turmas.appendChild(input_wrapper)
+    input_wrapper.className = 'control'
+    const turmas_input = document.createElement('input')
+    input_wrapper.appendChild(turmas_input)
+    turmas_input.value = disc.numTurmas || '1'
+    turmas_input.className = 'input'
+    turmas_input.addEventListener('change', curry(registra_num_turmas, disc), false)
 
     const professores = linha.insertCell()
     const text_wrapper = document.createElement('span')

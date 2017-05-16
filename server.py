@@ -101,10 +101,8 @@ def carregar_alunos(horarios, num_horarios, num_dias):
         try:
             id_, periodo = nome.split(' - ')
             turma, curso = periodo.split('-')
-            print(f'id: {id_}, turma: {turma}, curso: {curso}')
             return curso, turma, id_
         except ValueError:
-            print(f'ops, {nome}')
             return nome
 
     return sorted(alunos, key=sort_func)
@@ -162,6 +160,10 @@ def recupera_solucao(pk):
     return result
 
 
+def ajustar_turmas(disciplinas):
+    pass
+
+
 def executar_solver(dados):
     """Executa o solver a partir dos dados de entrada. `dados` deve conter
     dois dicts: `entrada` e `configuracao`. O primeiro será a entrada do solver,
@@ -174,6 +176,7 @@ def executar_solver(dados):
     além da própria solução.
     """
     entrada = dados['entrada']
+    ajustar_turmas(entrada['disciplinas'])
     configuracao = dados['configuracao']
 
     with open(INPUT_FILE, 'w', encoding='utf-8') as f:
