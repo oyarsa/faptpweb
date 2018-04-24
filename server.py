@@ -6,6 +6,10 @@ import sqlite3
 from subprocess import run, CalledProcessError
 from flask import Flask, request, render_template, jsonify
 
+if len(sys.argv) != 2:
+    print("Usage: py server.py PATH/TO/FAPTP_SOLVER")
+    exit()
+
 # Caminho para o executável do solver
 FAPTP = sys.argv[1]
 # Nome do arquivo do banco do SQLite3
